@@ -31,3 +31,34 @@ body {
     text-wrap: balance;
   }
 }
+
+.clock-wrapper {
+  background-color: blue;
+  /* height: 200px;
+  width: 200px;
+  border-radius: 100px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center; */
+}
+
+.grad {
+  background-color: #fff;
+  /* height: 10px;
+  width: 4px;
+  position: absolute;
+  left: 98px;
+  top: 5px;
+  transform-origin: center 95px; */
+}
+
+.secondHand {
+  background-color: red;
+  /* position: absolute;
+  height: 95px;
+  width: 2px;
+  left: 98px;
+  top: 5px;
+  transform-origin: center 95px; */
+}
