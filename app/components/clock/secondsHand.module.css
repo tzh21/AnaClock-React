@@ -9,7 +9,7 @@
 }
 
 .secondsHandAnimation {
-  animation: secondsHandMotion 10s infinite linear;
+  animation: secondsHandMotion 60s infinite linear;
 }
 
 @keyframes secondsHandMotion {
