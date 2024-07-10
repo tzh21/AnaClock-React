@@ -1,9 +1,0 @@
-.secondHands {
-  height: 50%;
-  width: 0px;
-  position: absolute;
-  top: 0px;
-  left: 50%;
-  transform-origin: bottom;
-  border: '1px solid black';
-}

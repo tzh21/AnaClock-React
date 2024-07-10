@@ -1,0 +1,12 @@
+.minuteHandAnimation {
+  animation: minuteHandMotion 3600s infinite linear;
+}
+
+@keyframes minuteHandMotion {
+  0% {
+    transform: rotate(var(--min-rot-start));
+  }
+  100% {
+    transform: rotate(var(--min-rot-end));
+  }
+}

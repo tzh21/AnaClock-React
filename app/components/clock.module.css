@@ -1,15 +1,5 @@
-.secondHand {
-  height: 50%;
-  width: 0px;
-  position: relative;
-  top: 0px;
-  left: 50%;
-  transform-origin: bottom;
-  border: 1px solid black;
-}
-
 .secondHandAnimation {
-  animation: secondHandMotion 60s infinite linear;
+  animation: secondHandMotion 10s infinite linear;
 }
 
 @keyframes secondHandMotion {
@@ -18,5 +8,31 @@
   }
   100% {
     transform: rotate(var(--sec-rot-end));
+  }
+}
+
+.minuteHandAnimation {
+  animation: minuteHandMotion 3600s infinite linear;
+}
+
+@keyframes minuteHandMotion {
+  0% {
+    transform: rotate(var(--min-rot-start));
+  }
+  100% {
+    transform: rotate(var(--min-rot-end));
+  }
+}
+
+.hourHandAnimation {
+  animation: hourHandMotion 43200s infinite linear;
+}
+
+@keyframes hourHandMotion {
+  0% {
+    transform: rotate(var(--hour-rot-start));
+  }
+  100% {
+    transform: rotate(var(--hour-rot-end));
   }
 }
