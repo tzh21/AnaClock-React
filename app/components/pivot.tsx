@@ -1,11 +1,14 @@
 import React from "react"
 
-export default function Pivot(clockSize: number) {
+export default function Pivot(
+  radius: number,
+  centerX: number, centerY: number
+) {
   return (
     <circle
-      cx={clockSize / 2}
-      cy={clockSize / 2}
-      r={clockSize * 0.02}
+      cx={centerX}
+      cy={centerY}
+      r={radius * 0.04}
       fill='black'
     ></circle>
   )

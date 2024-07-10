@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import styles from './minute.module.css'
+import styles from './hour.module.css'
 import * as d3 from 'd3';
 
-export default function Minute(
+export default function Hour(
   radius: number, 
   centerX: number, centerY: number
 ) {
-  const handWidth = radius * 0.02;
-  const handHeight = radius * 0.8;
+  const handWidth = radius * 0.04;
+  const handHeight = radius * 0.6;
   const handColor = 'black'
 
   // 实现拖动功能
@@ -27,8 +27,8 @@ export default function Minute(
 
     const startDeg = `${angle}deg`;
     const endDeg = `${angle + 360}deg`;
-    document.documentElement.style.setProperty('--min-rot-start', startDeg);
-    document.documentElement.style.setProperty('--min-rot-end', endDeg);
+    document.documentElement.style.setProperty('--hour-rot-start', startDeg);
+    document.documentElement.style.setProperty('--hour-rot-end', endDeg);
   }
   
   // 在 start 和 end 事件中都设置指针的位置，是为了防止抖动现象。
@@ -52,29 +52,29 @@ export default function Minute(
     .on('end', endDragging);
 
   useEffect(() => {
-    const minuteHand = d3.select<SVGLineElement, {}>('#minuteHand');
-    minuteHand.call(DragBehavior);
+    const hourHand = d3.select<SVGLineElement, {}>('#hourHand');
+    hourHand.call(DragBehavior);
   }, [])
 
-  function updateMinute() {
-    const min = new Date().getMinutes();
-    const minStart = `${(min / 60) * 360}deg`;
-    const minEnd = `${(min / 60) * 360 + 360}deg`;
-    document.documentElement.style.setProperty('--min-rot-start', minStart);
-    document.documentElement.style.setProperty('--min-rot-end', minEnd);
+  function updateHour() {
+    const hour = new Date().getHours();
+    const hourStart = `${(hour / 60) * 360}deg`;
+    const hourEnd = `${(hour / 60) * 360 + 360}deg`;
+    document.documentElement.style.setProperty('--hour-rot-start', hourStart);
+    document.documentElement.style.setProperty('--hour-rot-end', hourEnd);
   }
 
   useEffect(() => {
-    updateMinute();
+    updateHour();
   }, []);
 
   return (<line
-    id='minuteHand'
+    id='hourHand'
     x1={centerX}
     y1={centerY}
     x2={centerX}
     y2={centerY - handHeight}
-    className= { dragging ? '' : `${styles.minuteHandAnimation}`}
+    className= { dragging ? '' : `${styles.hourHandAnimation}`}
     style={{stroke: handColor, strokeWidth: handWidth, transformOrigin: `${centerX}px ${centerY}px`}}
   ></line>)
 }

@@ -1,0 +1,12 @@
+.hourHandAnimation {
+  animation: hourHandMotion 3600s infinite linear;
+}
+
+@keyframes hourHandMotion {
+  0% {
+    transform: rotate(var(--hour-rot-start));
+  }
+  100% {
+    transform: rotate(var(--hour-rot-end));
+  }
+}

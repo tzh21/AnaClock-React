@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react';
 import styles from './second.module.css'
 import * as d3 from 'd3';
 
-export default function Second(clockSize: number) {
-  const radius = clockSize / 2;
-  const centerX = radius;
-  const centerY = radius;
-
-  const handWidth = clockSize * 0.0075;
-  const handHeight = clockSize / 2 * 0.9;
+export default function Second(
+  radius: number,
+  centerX: number, centerY: number
+) {
+  const handWidth = radius * 0.015;
+  const handHeight = radius * 0.9;
   const handColor = 'red'
 
   // 实现拖动功能
@@ -71,11 +70,11 @@ export default function Second(clockSize: number) {
 
   return (<line
     id='secondHand'
-    x1={clockSize / 2}
-    y1={clockSize / 2}
-    x2={clockSize / 2}
-    y2={clockSize * 0.05}
+    x1={centerX}
+    y1={centerY}
+    x2={centerX}
+    y2={centerY - handHeight}
     className= { dragging ? '' : `${styles.secondHandAnimation}`}
-    style={{stroke: handColor, strokeWidth: handWidth, transformOrigin: `${clockSize / 2}px ${clockSize / 2}px`}}
+    style={{stroke: handColor, strokeWidth: handWidth, transformOrigin: `${centerX}px ${centerY}px`}}
   ></line>)
 }
