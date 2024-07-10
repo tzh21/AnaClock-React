@@ -1,12 +1,11 @@
 'use client'
 
-// import Clock from '@/app/components/clock';
-import D3Clock from "./components/d3Clock"
+import Clock from "./components/clock"
 
 export default function Page() {
   return (<div style={{position: 'absolute'}}>
     <div>hello</div>
-    {D3Clock()}
+    {Clock()}
     <div>hello</div>
   </div>)
 }
