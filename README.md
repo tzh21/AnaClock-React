@@ -1,5 +1,29 @@
 # 模拟时钟 React 组件
 
+## 运行方法
+
+需要预先安装：
+
+* node.js
+
+在项目根目录打开终端，安装依赖
+
+```sh
+npm install
+```
+
+运行项目
+
+```sh
+npm dev
+```
+
+在浏览器中访问页面所在的 url（默认为 localhost:3000）
+
+应该看到类似以下的场景
+
+![](readme-assets/image.png)
+
 ## 目标清单
 
 ### 时钟
