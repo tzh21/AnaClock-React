@@ -4,9 +4,9 @@
 
 @keyframes secondHandMotion {
   0% {
-    transform: rotate(var(--sec-rot-start));
+    transform: rotate(0deg);
   }
   100% {
-    transform: rotate(var(--sec-rot-end));
+    transform: rotate(360deg);
   }
 }

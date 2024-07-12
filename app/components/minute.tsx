@@ -3,78 +3,110 @@ import styles from './minute.module.css'
 import * as d3 from 'd3';
 
 export default function Minute(
-  radius: number, 
-  centerX: number, centerY: number
+  radius: number,
+  centerX: number, centerY: number,
+  startDeg: number,
+  setDeg: (newDeg: number) => void, // 回调函数，用于实时更新父组件中的角度
+  onHandDragged: (newDeg: number) => void, // 回调函数，用于拖拽指针时，更新父组件中的角度
 ) {
   const handWidth = radius * 0.02;
   const handHeight = radius * 0.8;
   const handColor = 'black'
 
+  // 根据初始化角度计算指针的起始位置
+  const x1 = centerX
+  const y1 = centerY
+  const x2 = centerX + handHeight * Math.sin(startDeg * Math.PI / 180)
+  const y2 = centerY - handHeight * Math.cos(startDeg * Math.PI / 180)
+
   // 实现拖动功能
 
-  const [dragging, setDragging] = useState(false);
-
-  function setNewAngle(elem: SVGLineElement, event: DragEvent) {
+  // 表示当前指针是否停止移动；拖拽指针时，停止指针的移动
+  const [stopMoving, setStop] = useState(false);
+  // 获取鼠标位置和0时夹角（弧度）
+  function getDragEventAngle(event: DragEvent) {
     const dx = event.x - centerX
-    const dy = event.y - centerY
-    const angle = Math.atan2(dy, dx)
-    const newX = centerX + handHeight * Math.cos(angle)
-    const newY = centerY + handHeight * Math.sin(angle)
-
+    const dy = centerY - event.y
+    const angle = Math.atan2(dx, dy)
+    return angle;
+  }
+  function getHandReg(hand: HTMLElement): number{
+    const x2 = parseFloat(hand.getAttribute('x2') || '0');
+    const y2 = parseFloat(hand.getAttribute('y2') || '0');
+    const dx = x2 - centerX;
+    const dy = centerY - y2;
+    var deg = Math.atan2(dx, dy) * (180 / Math.PI);
+    if (deg < 0) deg += 360;
+    return deg;
+  }
+  // 根据鼠标位置设置新的 x2, y2
+  function setNewAngle(elem: SVGLineElement, event: DragEvent) {
+    const angle = getDragEventAngle(event);
+    const newX = centerX + handHeight * Math.sin(angle)
+    const newY = centerY - handHeight * Math.cos(angle)
     d3.select(elem)
       .attr('x2', newX)
       .attr('y2', newY)
-
-    const startDeg = `${angle}deg`;
-    const endDeg = `${angle + 360}deg`;
-    document.documentElement.style.setProperty('--min-rot-start', startDeg);
-    document.documentElement.style.setProperty('--min-rot-end', endDeg);
   }
-  
-  // 在 start 和 end 事件中都设置指针的位置，是为了防止抖动现象。
   function startDragging(this: SVGLineElement, event: DragEvent) {
-    setDragging(true);
+    setStop(true);
     setNewAngle(this, event);
   }
-
   function dragged(this: SVGLineElement, event: DragEvent) {
     setNewAngle(this, event);
   }
-
   function endDragging(this: SVGLineElement, event: DragEvent) {
     setNewAngle(this, event);
-    setDragging(false);
+    const minuteHand = document.getElementById('minuteHand'); if (!minuteHand) return;
+    const deg = getHandReg(minuteHand);
+    onHandDragged(deg);
+    setStop(false);
   }
-
   const DragBehavior = d3.drag<SVGLineElement, any>()
     .on('start', startDragging)
     .on('drag', dragged)
     .on('end', endDragging);
-
   useEffect(() => {
     const minuteHand = d3.select<SVGLineElement, {}>('#minuteHand');
     minuteHand.call(DragBehavior);
   }, [])
 
-  function updateMinute() {
-    const min = new Date().getMinutes();
-    const minStart = `${(min / 60) * 360}deg`;
-    const minEnd = `${(min / 60) * 360 + 360}deg`;
-    document.documentElement.style.setProperty('--min-rot-start', minStart);
-    document.documentElement.style.setProperty('--min-rot-end', minEnd);
+  function getRotatingDeg(hand: HTMLElement): number {
+    const x2 = parseFloat(hand.getAttribute('x2') || '0');
+    const y2 = parseFloat(hand.getAttribute('y2') || '0');
+    const dx = x2 - centerX;
+    const dy = centerY - y2;
+    var initDeg = Math.atan2(dx, dy) * (180 / Math.PI);
+    if (initDeg < 0) initDeg += 360;
+    const transform = window.getComputedStyle(hand).transform;
+    // 转移矩阵的格式为 "matrix(cos, sin, -sin, cos, 0, 0)"
+    var transformMatrix = transform.split('(')[1].split(')')[0].split(',');
+    const cosValue = parseFloat(transformMatrix[0]);
+    const sinValue = parseFloat(transformMatrix[1]);
+    var rotateDeg = Math.atan2(sinValue, cosValue) * (180 / Math.PI);
+    if (rotateDeg < 0) rotateDeg += 360;
+    const deg = (rotateDeg + initDeg) % 360;
+    return deg;
   }
 
   useEffect(() => {
-    updateMinute();
-  }, []);
+    const interval = setInterval(() => {
+      // 如果指针停止移动，不更新秒数
+      if (stopMoving) return;
+      const minuteHand = document.getElementById('minuteHand'); if (!minuteHand) return;
+      const deg = getRotatingDeg(minuteHand);
+      setDeg(deg);
+    }, 500);
+    return () => clearInterval(interval);
+  }, [stopMoving])
 
   return (<line
     id='minuteHand'
-    x1={centerX}
-    y1={centerY}
-    x2={centerX}
-    y2={centerY - handHeight}
-    className= { dragging ? '' : `${styles.minuteHandAnimation}`}
+    x1={x1}
+    y1={y1}
+    x2={x2}
+    y2={y2}
+    className= { stopMoving ? '' : `${styles.minuteHandAnimation}`}
     style={{stroke: handColor, strokeWidth: handWidth, transformOrigin: `${centerX}px ${centerY}px`}}
   ></line>)
 }
