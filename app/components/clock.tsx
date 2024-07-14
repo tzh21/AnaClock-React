@@ -88,16 +88,17 @@ export default function Clock(
     }
   }
 
-  const [isMorning, setIsMorning] = useState<boolean>(true);
-  function setHourDegAndSwitch24(newHourDeg: number) {
-    const hour = hourDeg / 30;
-    const newHour = newHourDeg / 30;
-    if (hour < 12 && newHour >= 12) {
-      setIsMorning(false);
-    } else if (hour >= 12 && newHour < 12) {
-      setIsMorning(true);
-    }
-  }
+  // const [isMorning, setIsMorning] = useState<boolean>(true);
+  // function setHourDegAndSwitch24(newHourDeg: number) {
+  //   const hour = hourDegRef.current / 30;
+  //   const newHour = newHourDeg / 30;
+  //   if (hour < 12 && newHour >= 12) {
+  //     setIsMorning(false);
+  //   } else {
+  //     setIsMorning(true);
+  //   }
+  //   setHourDeg(newHourDeg);
+  // }
 
   return (<div>
     <svg style={{width: clockContainerSize, height: clockContainerSize}}>
@@ -108,7 +109,7 @@ export default function Clock(
 
       {SecondHand(radius, centerX, centerY, secondStartDeg, setSecondDeg, () => {})}
       {MinuteHand(radius, centerX, centerY, minuteStartDeg, setMinuteDeg, onMinuteHandDragged)}
-      {HourHand(radius, centerX, centerY, hourStartDeg, setHourDegAndSwitch24, onHourHandDragged)}
+      {HourHand(radius, centerX, centerY, hourStartDeg, setHourDeg, onHourHandDragged)}
 
       {/* 表盘中心的小圆圈 */}
       {Pivot(radius, centerX, centerY)}
@@ -132,7 +133,8 @@ export default function Clock(
         <button type='submit'>确定</button>
       </form> :
       <div style={{display: 'flex', flexDirection: 'row'}}>
-        {isMorning ? Math.floor(hourDeg / 30) : Math.floor(hourDeg / 30) + 12} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)}
+        {Math.floor(hourDeg / 30)} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)}
+        {/* {isMorning ? Math.floor(hourDeg / 30) : Math.floor(hourDeg / 30) + 12} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)} */}
         <div style={{width: 20}}></div>
         <button
           onClick={() => {
