@@ -1,8 +1,10 @@
-import Second from './second'
+'use client'
+
+import SecondHand from './second'
 import Pivot from './pivot';
-import Minute from './minute';
+import MinuteHand from './minute';
 import ScaleGroup from './scale';
-import Hour from './hour';
+import HourHand from './hour';
 import { useEffect, useState } from 'react';
 
 /*
@@ -28,7 +30,6 @@ export default function Clock(
 
   // 初始化指针角度到当前时间
   useEffect(() => {
-    // const date = new Date();
     const second = date.getSeconds();
     const minute = date.getMinutes();
     const hour = date.getHours();
@@ -44,6 +45,7 @@ export default function Clock(
   const [hourDeg, setHourDeg] = useState<number>(date.getHours() % 12 / 12 * 360 + date.getMinutes() / 60 * 30);
   const [secondDeg, setSecondDeg] = useState<number>(date.getSeconds())
 
+  // 响应拖动分针事件。会根据分针的角度调整时针的角度。
   function onMinuteHandDragged(newMinuteDeg: number) {
     setMinuteStartDeg(newMinuteDeg);
     const baseHourDeg = Math.floor(hourDeg / 30) * 30;
@@ -51,30 +53,77 @@ export default function Clock(
     setHourStartDeg(baseHourDeg + hourOffset);
   }
 
+  // 响应拖动时针事件。会根据时针的角度调整分针的角度。
   function onHourHandDragged(newHourDeg: number) {
     setHourStartDeg(newHourDeg);
     const minuteOffset = newHourDeg % 30 / 30 * 360;
     setMinuteStartDeg(minuteOffset);
   }
 
-  return (
-    <div>
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editingHour, setEditingHour] = useState<number>(0);
+  const [editingMinute, setEditingMinute] = useState<number>(0);
+  const [editingSecond, setEditingSecond] = useState<number>(0);
+
+  function handleEditingTimeChange(e: React.ChangeEvent<HTMLInputElement>, type: 'hours' | 'minutes' | 'seconds') {
+    const value = Math.max(0, parseInt(e.target.value, 10));
+    switch (type) {
+      case 'hours':
+        setEditingHour(value);
+        break;
+      case 'minutes':
+        setEditingMinute(value);
+        break;
+      case 'seconds':
+        setEditingSecond(value);
+        break;
+    }
+  }
+
+  return (<div>
     <svg style={{width: clockContainerSize, height: clockContainerSize}}>
       {/* 表盘边缘 */}
       <circle cx={centerX} cy={centerY} r={radius} stroke='black' strokeWidth={2} fill='transparent'></circle>
       {/* 刻度 */}
       {ScaleGroup(radius, centerX, centerY)}
 
-      {Second(radius, centerX, centerY, secondStartDeg, setSecondDeg, () => {})}
-      {Minute(radius, centerX, centerY, minuteStartDeg, setMinuteDeg, onMinuteHandDragged)}
-      {Hour(radius, centerX, centerY, hourStartDeg, setHourDeg, onHourHandDragged)}
+      {SecondHand(radius, centerX, centerY, secondStartDeg, setSecondDeg, () => {})}
+      {MinuteHand(radius, centerX, centerY, minuteStartDeg, setMinuteDeg, onMinuteHandDragged)}
+      {HourHand(radius, centerX, centerY, hourStartDeg, setHourDeg, onHourHandDragged)}
 
       {/* 表盘中心的小圆圈 */}
       {Pivot(radius, centerX, centerY)}
     </svg>
 
-    <div>{Math.floor(hourDeg / 30)}:{Math.floor(minuteDeg / 6)}:{Math.floor(secondDeg / 6)}</div>
-
-    </div>
-  );
+    { editing ? 
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          setSecondStartDeg(editingSecond * 6);
+          setMinuteStartDeg(editingMinute * 6);
+          const hourBaseDeg = editingHour * 30;
+          const hourOffsetDeg = editingMinute / 60 * 30;
+          setHourStartDeg(hourBaseDeg + hourOffsetDeg);
+          setEditing(false);
+        }}
+      >
+        <input type='number' value={editingHour} onChange={(e) => handleEditingTimeChange(e, 'hours')}></input>
+        <input type='number' value={editingMinute} onChange={(e) => handleEditingTimeChange(e, 'minutes')}></input>
+        <input type='number' value={editingSecond} onChange={(e) => handleEditingTimeChange(e, 'seconds')}></input>
+        <button type='submit'>确定</button>
+      </form> :
+      <div style={{display: 'flex', flexDirection: 'row'}}>
+        {Math.floor(hourDeg / 30)} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)}
+        <div style={{width: 20}}></div>
+        <button
+          onClick={() => {
+            setEditingHour(Math.floor(hourDeg / 30));
+            setEditingMinute(Math.floor(minuteDeg / 6));
+            setEditingSecond(Math.floor(secondDeg / 6));
+            setEditing(true)
+          }
+        }>修改</button>
+      </div>
+    }
+  </div>);
 }
