@@ -5,7 +5,7 @@ import Pivot from './pivot';
 import MinuteHand from './minute';
 import ScaleGroup from './scale';
 import HourHand from './hour';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /*
 Clock 组件维护所有指针的角度，角度变化时计算并显示时间
@@ -45,19 +45,27 @@ export default function Clock(
   const [hourDeg, setHourDeg] = useState<number>(date.getHours() % 12 / 12 * 360 + date.getMinutes() / 60 * 30);
   const [secondDeg, setSecondDeg] = useState<number>(date.getSeconds())
 
-  // 响应拖动分针事件。会根据分针的角度调整时针的角度。
+  const hourDegRef = useRef(hourDeg);
+  useEffect(() => {
+    hourDegRef.current = hourDeg;
+  }, [hourDeg])
+
   function onMinuteHandDragged(newMinuteDeg: number) {
     setMinuteStartDeg(newMinuteDeg);
-    const baseHourDeg = Math.floor(hourDeg / 30) * 30;
+    setMinuteDeg(newMinuteDeg);
+    const baseHourDeg = Math.floor(hourDegRef.current / 30) * 30;
     const hourOffset = newMinuteDeg / 360 * 30;
     setHourStartDeg(baseHourDeg + hourOffset);
+    setHourDeg(baseHourDeg + hourOffset);
   }
 
   // 响应拖动时针事件。会根据时针的角度调整分针的角度。
   function onHourHandDragged(newHourDeg: number) {
     setHourStartDeg(newHourDeg);
+    setHourDeg(newHourDeg);
     const minuteOffset = newHourDeg % 30 / 30 * 360;
     setMinuteStartDeg(minuteOffset);
+    setMinuteDeg(minuteOffset);
   }
 
   const [editing, setEditing] = useState<boolean>(false);
@@ -80,6 +88,17 @@ export default function Clock(
     }
   }
 
+  const [isMorning, setIsMorning] = useState<boolean>(true);
+  function setHourDegAndSwitch24(newHourDeg: number) {
+    const hour = hourDeg / 30;
+    const newHour = newHourDeg / 30;
+    if (hour < 12 && newHour >= 12) {
+      setIsMorning(false);
+    } else if (hour >= 12 && newHour < 12) {
+      setIsMorning(true);
+    }
+  }
+
   return (<div>
     <svg style={{width: clockContainerSize, height: clockContainerSize}}>
       {/* 表盘边缘 */}
@@ -89,7 +108,7 @@ export default function Clock(
 
       {SecondHand(radius, centerX, centerY, secondStartDeg, setSecondDeg, () => {})}
       {MinuteHand(radius, centerX, centerY, minuteStartDeg, setMinuteDeg, onMinuteHandDragged)}
-      {HourHand(radius, centerX, centerY, hourStartDeg, setHourDeg, onHourHandDragged)}
+      {HourHand(radius, centerX, centerY, hourStartDeg, setHourDegAndSwitch24, onHourHandDragged)}
 
       {/* 表盘中心的小圆圈 */}
       {Pivot(radius, centerX, centerY)}
@@ -113,7 +132,7 @@ export default function Clock(
         <button type='submit'>确定</button>
       </form> :
       <div style={{display: 'flex', flexDirection: 'row'}}>
-        {Math.floor(hourDeg / 30)} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)}
+        {isMorning ? Math.floor(hourDeg / 30) : Math.floor(hourDeg / 30) + 12} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)}
         <div style={{width: 20}}></div>
         <button
           onClick={() => {
