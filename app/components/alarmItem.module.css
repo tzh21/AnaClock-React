@@ -1,0 +1,59 @@
+.alarmItemContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 16px;
+    margin: 8px 0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .time {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .description {
+    font-size: 14px;
+    color: #999;
+  }
+  
+  .info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .switch {
+    width: 40px;
+    height: 20px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #ccc;
+    border-radius: 10px;
+    position: relative;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .switch:checked {
+    background-color: #4caf50;
+  }
+  
+  .switch:before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #fff;
+    top: 1px;
+    left: 1px;
+    transition: transform 0.3s;
+  }
+  
+  .switch:checked:before {
+    transform: translateX(20px);
+  }
+  
