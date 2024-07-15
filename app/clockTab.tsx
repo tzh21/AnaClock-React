@@ -18,6 +18,6 @@ export default function ClockTab() {
   }, [])
 
   return (<div style={{width: '100%'}}>
-    {StaticClock(timeStamp)}
+    {StaticClock(timeStamp, true, setTimeStamp)}
   </div>)
 }

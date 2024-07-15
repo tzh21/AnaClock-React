@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ScaleGroup from './scale';
 import Pivot from './pivot';
 import * as d3 from 'd3';
@@ -12,6 +12,7 @@ import * as d3 from 'd3';
 export default function StaticClock(
   timeStamp: number,
   draggable: boolean = true,
+  setNewTimeStamp: (newTimeStamp: number) => void
 ) {
   // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
   const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
@@ -45,22 +46,37 @@ export default function StaticClock(
   }
 
   function dragElem(elem: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
-    const dx = event.x - centerX
-    const dy = centerY - event.y
-    const rad = Math.atan2(dx, dy)
-    const newX2 = centerX + datum.len * Math.sin(rad)
-    const newY2 = centerY - datum.len * Math.cos(rad)
-    d3.select(elem)
-      .attr('x2', newX2)
-      .attr('y2', newY2)
+    const newRad = Math.atan2(event.x - centerX, centerY - event.y)
+    const oldRad = Math.atan2(elem.x2.baseVal.value - centerX, centerY - elem.y2.baseVal.value)
+    const deltaDeg = (newRad - oldRad) / Math.PI * 180
+    var deltaTimeStamp = 0
+    switch (datum.id) {
+      case 'secondHand':
+        deltaTimeStamp = deltaDeg / 360 * 60000
+        break
+      case 'minuteHand':
+        deltaTimeStamp = deltaDeg / 360 * 3600000
+        break
+      case 'hourHand':
+        deltaTimeStamp = deltaDeg / 360 * 43200000
+        break
+    }
+    setInternalTimeStamp(prevTimeStamp => prevTimeStamp + deltaTimeStamp)
   }
   
   function drag(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
     dragElem(this, event, datum)
   }
 
+  const internalTimeStampRef = useRef(internalTimeStamp)
+  useEffect(() => {
+    internalTimeStampRef.current = internalTimeStamp
+  }, [internalTimeStamp])
+
   function endDragging(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
     dragElem(this, event, datum)
+    console.log(internalTimeStampRef.current)
+    setNewTimeStamp(internalTimeStampRef.current)
     setDragging(false)
   }
 
