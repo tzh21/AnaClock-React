@@ -1,150 +1,131 @@
-'use client'
-
-import SecondHand from './second'
-import Pivot from './pivot';
-import MinuteHand from './minute';
+import React, { use, useEffect, useState } from 'react';
 import ScaleGroup from './scale';
-import HourHand from './hour';
-import { useEffect, useRef, useState } from 'react';
+import Pivot from './pivot';
+import * as d3 from 'd3';
 
 /*
-Clock 组件维护所有指针的角度，角度变化时计算并显示时间
-角度由指针组件维护，更新来源包括定时移动和拖拽
-拖拽指针后，指针组件会调用一个回调函数，Clock 组件会根据被拖拽的指针角度计算其他指针的角度。
-比如拖拽分针后，时针的角度也会发生变化；拖拽时针后，时针和分针的角度都会发生变化。
+静态时钟组件。
+接受一个时间戳作为参数，返回在该时间下时钟的函数组件，核心为三个指针的角度。
+接受一个回调函数作为参数，用于在每次拖拽结束后，向父组件传递拖拽后的指针角度。父组件可以通过这个角度来更新时间。
+接受一个参数作为拖拽功能的开关。
 */
-export default function Clock(
-  clockContainerSize: number = 400,
+export default function StaticClock(
+  timeStamp: number,
+  draggable: boolean = true,
 ) {
-  const padding = clockContainerSize * 0.1;
-  const clockSize = clockContainerSize - padding * 2;
-  const radius = clockSize / 2;
-  const centerX = clockContainerSize / 2;
-  const centerY = clockContainerSize / 2;
-
-  const [minuteStartDeg, setMinuteStartDeg] = useState<number>(0);
-  const [hourStartDeg, setHourStartDeg] = useState<number>(0);
-  const [secondStartDeg, setSecondStartDeg] = useState<number>(0)
-
-  const date = new Date();
-
-  // 初始化指针角度到当前时间
+  // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
+  const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
   useEffect(() => {
-    const second = date.getSeconds();
-    const minute = date.getMinutes();
-    const hour = date.getHours();
-    const currentSecondDeg = (second / 60) * 360;
-    const currentHourDeg = ((hour % 12) / 12) * 360 + (minute / 60) * 30;
-    const currentMinuteDeg = (minute / 60) * 360 + (second / 60) * 6;
-    setSecondStartDeg(currentSecondDeg);
-    setMinuteStartDeg(currentMinuteDeg);
-    setHourStartDeg(currentHourDeg);
+    if (!dragging) {
+      setInternalTimeStamp(timeStamp)
+    }
+  }, [timeStamp])
+
+  const [dragging, setDragging] = useState(false)
+
+  // 通过时间戳计算指针角度
+  const secondHandDeg = internalTimeStamp % 60000 / 60000 * 360
+  const minuteHandDeg = internalTimeStamp % 3600000 / 3600000 * 360
+  const hourHandDeg = internalTimeStamp % 86400000 / 43200000 * 360
+
+  // 通过角度指针末端位置
+  const [secondHandX2, secondHandY2] = calcHandPosition(secondHandDeg, secondHandLen, centerX, centerY)
+  const [minuteHandX2, minuteHandY2] = calcHandPosition(minuteHandDeg, minuteHandLen, centerX, centerY)
+  const [hourHandX2, hourHandY2] = calcHandPosition(hourHandDeg, hourHandLen, centerX, centerY)
+
+  useEffect(() => {
+    d3.select<SVGLineElement, HandIdAndLen>('#secondHand').data([secondHandAndLen])
+    d3.select<SVGLineElement, HandIdAndLen>('#minuteHand').data([minuteHandAndLen])
+    d3.select<SVGLineElement, HandIdAndLen>('#hourHand').data([hourHandAndLen])
   }, [])
 
-  const [minuteDeg, setMinuteDeg] = useState<number>(date.getMinutes() / 60 * 360 + date.getSeconds() / 60 * 6);
-  const [hourDeg, setHourDeg] = useState<number>(date.getHours() % 12 / 12 * 360 + date.getMinutes() / 60 * 30);
-  const [secondDeg, setSecondDeg] = useState<number>(date.getSeconds())
+  function startDragging(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
+    setDragging(true)
+    dragElem(this, event, datum)
+  }
 
-  const hourDegRef = useRef(hourDeg);
+  function dragElem(elem: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
+    const dx = event.x - centerX
+    const dy = centerY - event.y
+    const rad = Math.atan2(dx, dy)
+    const newX2 = centerX + datum.len * Math.sin(rad)
+    const newY2 = centerY - datum.len * Math.cos(rad)
+    d3.select(elem)
+      .attr('x2', newX2)
+      .attr('y2', newY2)
+  }
+  
+  function drag(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
+    dragElem(this, event, datum)
+  }
+
+  function endDragging(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
+    dragElem(this, event, datum)
+    setDragging(false)
+  }
+
+  const DragBehavior = d3.drag<SVGLineElement, HandIdAndLen>()
+    .on('start', startDragging)
+    .on('drag', drag)
+    .on('end', endDragging)
+
   useEffect(() => {
-    hourDegRef.current = hourDeg;
-  }, [hourDeg])
-
-  function onMinuteHandDragged(newMinuteDeg: number) {
-    setMinuteStartDeg(newMinuteDeg);
-    setMinuteDeg(newMinuteDeg);
-    const baseHourDeg = Math.floor(hourDegRef.current / 30) * 30;
-    const hourOffset = newMinuteDeg / 360 * 30;
-    setHourStartDeg(baseHourDeg + hourOffset);
-    setHourDeg(baseHourDeg + hourOffset);
-  }
-
-  // 响应拖动时针事件。会根据时针的角度调整分针的角度。
-  function onHourHandDragged(newHourDeg: number) {
-    setHourStartDeg(newHourDeg);
-    setHourDeg(newHourDeg);
-    const minuteOffset = newHourDeg % 30 / 30 * 360;
-    setMinuteStartDeg(minuteOffset);
-    setMinuteDeg(minuteOffset);
-  }
-
-  const [editing, setEditing] = useState<boolean>(false);
-  const [editingHour, setEditingHour] = useState<number>(0);
-  const [editingMinute, setEditingMinute] = useState<number>(0);
-  const [editingSecond, setEditingSecond] = useState<number>(0);
-
-  function handleEditingTimeChange(e: React.ChangeEvent<HTMLInputElement>, type: 'hours' | 'minutes' | 'seconds') {
-    const value = Math.max(0, parseInt(e.target.value, 10));
-    switch (type) {
-      case 'hours':
-        setEditingHour(value);
-        break;
-      case 'minutes':
-        setEditingMinute(value);
-        break;
-      case 'seconds':
-        setEditingSecond(value);
-        break;
+    if (draggable) {
+      d3.select<SVGLineElement, HandIdAndLen>('#secondHand').call(DragBehavior)
+      d3.select<SVGLineElement, HandIdAndLen>('#minuteHand').call(DragBehavior)
+      d3.select<SVGLineElement, HandIdAndLen>('#hourHand').call(DragBehavior)
     }
-  }
+  }, [draggable])
 
-  // const [isMorning, setIsMorning] = useState<boolean>(true);
-  // function setHourDegAndSwitch24(newHourDeg: number) {
-  //   const hour = hourDegRef.current / 30;
-  //   const newHour = newHourDeg / 30;
-  //   if (hour < 12 && newHour >= 12) {
-  //     setIsMorning(false);
-  //   } else {
-  //     setIsMorning(true);
-  //   }
-  //   setHourDeg(newHourDeg);
-  // }
-
-  return (<div>
+  return (<div style={{width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
     <svg style={{width: clockContainerSize, height: clockContainerSize}}>
-      {/* 表盘边缘 */}
-      <circle cx={centerX} cy={centerY} r={radius} stroke='black' strokeWidth={2} fill='transparent'></circle>
+      {/* 表盘 */}
+      <circle cx={centerX} cy={centerY} r={radius} fill="transparent" stroke="black" strokeWidth={2} />
+      
       {/* 刻度 */}
       {ScaleGroup(radius, centerX, centerY)}
 
-      {SecondHand(radius, centerX, centerY, secondStartDeg, setSecondDeg, () => {})}
-      {MinuteHand(radius, centerX, centerY, minuteStartDeg, setMinuteDeg, onMinuteHandDragged)}
-      {HourHand(radius, centerX, centerY, hourStartDeg, setHourDeg, onHourHandDragged)}
+      {/* 秒针 */}
+      <line id='secondHand' x1={centerX} y1={centerY} x2={secondHandX2} y2={secondHandY2} style={{stroke: 'red', strokeWidth: radius * 0.02}}></line>
+
+      {/* 分针 */}
+      <line id='minuteHand' x1={centerX} y1={centerY} x2={minuteHandX2} y2={minuteHandY2} style={{stroke: 'black', strokeWidth: radius * 0.03}}></line>
+
+      {/* 时针 */}
+      <line id='hourHand' x1={centerX} y1={centerY} x2={hourHandX2} y2={hourHandY2} style={{stroke: 'black', strokeWidth: radius * 0.05}}></line>
 
       {/* 表盘中心的小圆圈 */}
       {Pivot(radius, centerX, centerY)}
     </svg>
+  </div>)
+};
 
-    { editing ? 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          setSecondStartDeg(editingSecond * 6);
-          setMinuteStartDeg(editingMinute * 6);
-          const hourBaseDeg = editingHour * 30;
-          const hourOffsetDeg = editingMinute / 60 * 30;
-          setHourStartDeg(hourBaseDeg + hourOffsetDeg);
-          setEditing(false);
-        }}
-      >
-        <input type='number' value={editingHour} onChange={(e) => handleEditingTimeChange(e, 'hours')}></input>
-        <input type='number' value={editingMinute} onChange={(e) => handleEditingTimeChange(e, 'minutes')}></input>
-        <input type='number' value={editingSecond} onChange={(e) => handleEditingTimeChange(e, 'seconds')}></input>
-        <button type='submit'>确定</button>
-      </form> :
-      <div style={{display: 'flex', flexDirection: 'row'}}>
-        {Math.floor(hourDeg / 30)} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)}
-        {/* {isMorning ? Math.floor(hourDeg / 30) : Math.floor(hourDeg / 30) + 12} : {Math.floor(minuteDeg / 6)} : {Math.floor(secondDeg / 6)} */}
-        <div style={{width: 20}}></div>
-        <button
-          onClick={() => {
-            setEditingHour(Math.floor(hourDeg / 30));
-            setEditingMinute(Math.floor(minuteDeg / 6));
-            setEditingSecond(Math.floor(secondDeg / 6));
-            setEditing(true)
-          }
-        }>修改</button>
-      </div>
-    }
-  </div>);
+// 时钟外观参数
+const clockContainerSize = 400
+const padding = clockContainerSize * 0.1
+const clockSize = clockContainerSize - padding * 2
+const radius = clockSize / 2
+const centerX = clockContainerSize / 2
+const centerY = clockContainerSize / 2
+
+const secondHandLen = radius * 0.9
+const minuteHandLen = radius * 0.8
+const hourHandLen = radius * 0.6
+
+interface HandIdAndLen {
+  id: string,
+  len: number
+}
+
+const secondHandAndLen: HandIdAndLen = { id: 'secondHand', len: secondHandLen }
+const minuteHandAndLen: HandIdAndLen = { id: 'minuteHand', len: minuteHandLen }
+const hourHandAndLen: HandIdAndLen = { id: 'hourHand', len: hourHandLen }
+
+function calcHandPosition(
+  deg: number, handLen: number,
+  x1: number, y1: number
+) {
+  const x2 = x1 + handLen * Math.sin(deg / 180 * Math.PI)
+  const y2 = y1 - handLen * Math.cos(deg / 180 * Math.PI)
+  return [x2, y2]
 }

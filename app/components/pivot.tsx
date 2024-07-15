@@ -1,5 +1,3 @@
-import React from "react"
-
 export default function Pivot(
   radius: number,
   centerX: number, centerY: number
