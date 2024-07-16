@@ -24,25 +24,46 @@ export default function AddAlarm() {
     const [showAlert, setShowAlert] = useState(false);
     const router = useRouter();
 
+    interface Alarm {
+        time: {
+          hour: number;
+          minute: number;
+        };
+        alarmName: string;
+        repeat: boolean;
+        work: boolean;
+      }
+
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        // 创建新的闹钟对象
         const newAlarm = {
             time,
             alarmName,
             repeat,
             work
         };
-        // 从LocalStorage读取已存在的闹钟数据
+    
         const existingAlarms = JSON.parse(localStorage.getItem('alarms') || '[]');
-        // 将新的闹钟添加到数组中
         existingAlarms.push(newAlarm);
-        // 保存更新后的闹钟数组到LocalStorage
-        localStorage.setItem('alarms', JSON.stringify(existingAlarms));
-
+    
+        const sortedAlarms = existingAlarms.sort((a: Alarm, b: Alarm) => {
+            // 优先根据 work 排序，work 为 true 的在前
+            if (a.work !== b.work) {
+                return b.work ? 1 : -1;
+            }
+            // 如果 work 相同，根据 hour 排序，hour 小的在前
+            if (a.time.hour !== b.time.hour) {
+                return a.time.hour - b.time.hour;
+            }
+            // 如果 hour 也相同，根据 minute 排序，minute 小的在前
+            return a.time.minute - b.time.minute;
+        });
+    
+        localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
+    
         setShowAlert(true);
-    };
+    };    
 
     useEffect(() => {
         if (showAlert) {

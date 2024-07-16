@@ -9,6 +9,11 @@ interface AlarmItemProps {
   work: boolean;
 }
 
+const handleWork = (e: React.MouseEvent<HTMLInputElement>) => {
+  e.preventDefault();
+  alert('handleWork');
+}
+
 export default function AlarmItem({ hour, minute, alarmName, repeat, work }: AlarmItemProps) {
   return (
     <div className={styles.alarmItemContainer}>
@@ -16,7 +21,7 @@ export default function AlarmItem({ hour, minute, alarmName, repeat, work }: Ala
         <div className={styles.time}>{`${hour < 10 ? '0' + hour : hour}:${minute < 10 ? '0' + minute : minute}`}</div>
         <div className={styles.description}>{alarmName}，{repeat}</div>
       </div>
-      <input type="checkbox" className={styles.switch} />
+      <input type="checkbox" className={styles.switch} onClick={handleWork} checked={work} />
     </div>
   );
 }
