@@ -16,13 +16,24 @@ export default function StaticClock(
 ) {
   // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
   const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
+
+  const [dragging, setDragging] = useState(false)
   useEffect(() => {
     if (!dragging) {
       setInternalTimeStamp(timeStamp)
     }
   }, [timeStamp])
 
-  const [dragging, setDragging] = useState(false)
+  useEffect(() => {
+    d3.select<SVGLineElement, HandIdAndLen>('#secondHand').data([secondHandAndLen])
+    d3.select<SVGLineElement, HandIdAndLen>('#minuteHand').data([minuteHandAndLen])
+    d3.select<SVGLineElement, HandIdAndLen>('#hourHand').data([hourHandAndLen])
+  }, [])
+
+  const internalTimeStampRef = useRef(internalTimeStamp)
+  useEffect(() => {
+    internalTimeStampRef.current = internalTimeStamp
+  }, [internalTimeStamp])
 
   // 通过时间戳计算指针角度
   const secondHandDeg = internalTimeStamp % 60000 / 60000 * 360
@@ -33,12 +44,6 @@ export default function StaticClock(
   const [secondHandX2, secondHandY2] = calcHandPosition(secondHandDeg, secondHandLen, centerX, centerY)
   const [minuteHandX2, minuteHandY2] = calcHandPosition(minuteHandDeg, minuteHandLen, centerX, centerY)
   const [hourHandX2, hourHandY2] = calcHandPosition(hourHandDeg, hourHandLen, centerX, centerY)
-
-  useEffect(() => {
-    d3.select<SVGLineElement, HandIdAndLen>('#secondHand').data([secondHandAndLen])
-    d3.select<SVGLineElement, HandIdAndLen>('#minuteHand').data([minuteHandAndLen])
-    d3.select<SVGLineElement, HandIdAndLen>('#hourHand').data([hourHandAndLen])
-  }, [])
 
   function startDragging(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
     setDragging(true)
@@ -67,11 +72,6 @@ export default function StaticClock(
   function drag(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
     dragElem(this, event, datum)
   }
-
-  const internalTimeStampRef = useRef(internalTimeStamp)
-  useEffect(() => {
-    internalTimeStampRef.current = internalTimeStamp
-  }, [internalTimeStamp])
 
   function endDragging(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
     dragElem(this, event, datum)
