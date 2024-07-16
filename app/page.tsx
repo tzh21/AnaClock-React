@@ -4,6 +4,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { useState } from 'react';
 import ClockTab from './clockTab';
+import AlarmTab from './alarmTab';
 import { TabContext, TabPanel } from '@mui/lab';
 
 export default function Page() {
@@ -31,7 +32,7 @@ function ClockTabs() {
         {ClockTab()}
       </TabPanel>
       <TabPanel value={'1'}>
-        <div>1</div>
+        {AlarmTab()}
       </TabPanel>
       <TabPanel value={'2'}>
         <div>2</div>
