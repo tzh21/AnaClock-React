@@ -51,7 +51,9 @@ export default function ClockTab() {
           setTimeStamp(editingHour * 3600000 + editingMinute * 60000 + editingSecond * 1000)
           setEditing(false)
         }} sx={{flex: 1}}>确认</Button>
-        <Button sx={{flex: 1}}>取消</Button>
+        <Button onClick={() => {
+          setEditing(false)
+        }} sx={{flex: 1}}>取消</Button>
       </div>
     }
     { !editing &&
