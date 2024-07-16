@@ -5,6 +5,8 @@ import Tab from '@mui/material/Tab';
 import { useState } from 'react';
 import ClockTab from './clockTab';
 import { TabContext, TabPanel } from '@mui/lab';
+import TimerTab from './timerTab';
+import StopwatchTab from './stopwatchTab';
 
 export default function Page() {
   return (<div style={{width: '100%', position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -34,10 +36,10 @@ function ClockTabs() {
         <div>1</div>
       </TabPanel>
       <TabPanel value={'2'}>
-        <div>2</div>
+        {TimerTab()}
       </TabPanel>
       <TabPanel value={'3'}>
-        <div>3</div>
+        {StopwatchTab()}
       </TabPanel>
     </TabContext>
   </div>)

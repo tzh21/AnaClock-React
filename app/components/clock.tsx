@@ -11,8 +11,8 @@ import * as d3 from 'd3';
 */
 export default function StaticClock(
   timeStamp: number,
-  draggable: boolean = true,
-  setNewTimeStamp: (newTimeStamp: number) => void
+  draggable: boolean = false,
+  setNewTimeStamp: (newTimeStamp: number) => void = (n) => {}
 ) {
   // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
   const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
