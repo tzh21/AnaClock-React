@@ -1,13 +1,11 @@
 import StaticClock from "./components/clock";
 import { useEffect, useState } from "react";
-
-import AlarmItem from "./components/alarmItem"
 import TextField from '@mui/material/TextField';
-import FormDialog from "./components/editAlarm"
+
+import AddButton from "./components/addButton";
+import Alarms from "./components/alarms";
 
 export default function AlarmTab() {
-    const [alarms, setAlarms] = useState<{ time: { hour: number; minute: number }; alarmName: string; repeat: string; work: boolean }[]>([]);
-
     const [timeStamp, setTimeStamp] = useState(0);
 
     const [digital, setDigital] = useState(false);
@@ -21,9 +19,6 @@ export default function AlarmTab() {
     const second = Math.floor(timeStamp % 60000 / 1000)
   
     useEffect(() => {
-        const storedAlarms = JSON.parse(localStorage.getItem('alarms') || '[]');
-        setAlarms(storedAlarms);
-
         const date = new Date()
         const timeZoneOffset = date.getTimezoneOffset() * 60000
         const initialTimeStamp = date.getTime() - timeZoneOffset
@@ -58,13 +53,12 @@ export default function AlarmTab() {
                 <div style={{ width: 8 }}></div>
                 <TextField value={second} label='秒' sx={{ width: 100 }} inputProps={{ readOnly: true }} />
             </div>
+            <div style={{height: 16}}></div>
             </div>
         )}
 
-        {FormDialog()}
+        {AddButton()}
 
-        {alarms.map((alarm, index) => (
-            <AlarmItem key={index} hour={alarm.time.hour} minute={alarm.time.minute} alarmName={alarm.alarmName} repeat={alarm.repeat} work={alarm.work} />
-        ))}
+        {Alarms()}
     </div>);
 }
