@@ -25,8 +25,8 @@ function ClockTabs() {
         <Tabs value={selectedTab} onChange={(e, newValue) => {setSelectedTab(newValue)}} centered>
           <Tab label="时钟" value={'0'}></Tab>
           <Tab label="闹钟" value={'1'}></Tab>
-          <Tab label="秒表" value={'2'}></Tab>
-          <Tab label="计时器" value={'3'}></Tab>
+          <Tab label="计时器" value={'2'}></Tab>
+          <Tab label="秒表" value={'3'}></Tab>
         </Tabs>
       </div>
       <TabPanel value={'0'}>
