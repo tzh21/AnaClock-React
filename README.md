@@ -15,7 +15,7 @@ npm install
 运行项目
 
 ```sh
-npm dev
+npm run dev
 ```
 
 在浏览器中访问页面所在的 url（默认为 localhost:3000）
