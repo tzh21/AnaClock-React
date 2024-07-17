@@ -19,6 +19,7 @@
 # misc
 .DS_Store
 *.pem
+.node-version
 
 # debug
 npm-debug.log*
