@@ -44,8 +44,8 @@ export default function AddButton() {
   }
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setTime({ ...time, [name]: parseInt(value) });
+    const { id, value } = event.target;
+    setTime({ ...time, [id]: parseInt(value) });
   };
 
   interface Alarm {
@@ -83,6 +83,7 @@ export default function AddButton() {
     });
 
     localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
+    window.dispatchEvent(new Event('alarms-updated'));
     setMessage("1");
     setOpen(false);
     setOpenTip(true);
@@ -144,7 +145,7 @@ export default function AddButton() {
             id="name"
             label="闹钟名称"
             type="text"
-            value={'闹钟'}
+            value={alarmName}
             onChange={(e) => setAlarmName(e.target.value)}
             fullWidth
           />
@@ -177,7 +178,7 @@ export default function AddButton() {
 
       <Snackbar
         open={openTip}
-        autoHideDuration={2000}
+        autoHideDuration={1000}
         onClose={handleTipClose}
         message={message}
         anchorOrigin={{
@@ -187,7 +188,6 @@ export default function AddButton() {
       >
         {message === "1" ? (
           <Alert
-          onClose={handleClose}
           severity="success"
           variant="filled"
           sx={{ width: '100%' }}
@@ -196,7 +196,6 @@ export default function AddButton() {
           </Alert>
         ) : (
           <Alert
-          onClose={handleClose}
           severity="error"
           variant="filled"
           sx={{ width: '100%' }}
