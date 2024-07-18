@@ -2,7 +2,11 @@
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import React from 'react';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import ClockTab from './clockTab';
 import AlarmTab from './alarmTab';
 import { TabContext, TabPanel } from '@mui/lab';
@@ -18,30 +22,46 @@ export default function Page() {
 
 // 拥有 tab 栏的组件，可在四个功能页面之间切换。
 function ClockTabs() {
-  const [selectedTab, setSelectedTab] = useState('0')
+  const { theme, setTheme } = useTheme();
+  const [selectedTab, setSelectedTab] = useState('0');
 
-  return (<div style={{width: 600, display: 'flex', flexDirection: 'column'}}>
-    <TabContext value={selectedTab}>
-      <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Tabs value={selectedTab} onChange={(e, newValue) => {setSelectedTab(newValue)}} centered>
-          <Tab label="时钟" value={'0'}></Tab>
-          <Tab label="闹钟" value={'1'}></Tab>
-          <Tab label="计时器" value={'2'}></Tab>
-          <Tab label="秒表" value={'3'}></Tab>
-        </Tabs>
+  return (
+    <>
+      <div style={{ position: 'absolute', top: 0, right: 0 }}>
+        <ToggleButtonGroup
+          color="primary"
+          value={theme}
+          exclusive
+          aria-label="ToggleMode">
+          <ToggleButton value="system" onClick={() => setTheme('system')}>System</ToggleButton>
+          <ToggleButton value="dark" onClick={() => setTheme('dark')}>Dark</ToggleButton>
+          <ToggleButton value="light" onClick={() => setTheme('light')}>Light</ToggleButton>
+        </ToggleButtonGroup>
       </div>
-      <TabPanel value={'0'}>
-        {ClockTab()}
-      </TabPanel>
-      <TabPanel value={'1'}>
-        {AlarmTab()}
-      </TabPanel>
-      <TabPanel value={'2'}>
-        {TimerTab()}
-      </TabPanel>
-      <TabPanel value={'3'}>
-        {StopwatchTab()}
-      </TabPanel>
-    </TabContext>
-  </div>)
+      <div style={{width: 1400, display: 'flex', flexDirection: 'column'}}>
+        <TabContext value={selectedTab}>
+          <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <Tabs value={selectedTab} onChange={(e, newValue) => {setSelectedTab(newValue)}} centered>
+              <Tab label="时钟" value={'0'} className="text-black dark:text-white"></Tab>
+              <Tab label="闹钟" value={'1'} className="text-black dark:text-white"></Tab>
+              <Tab label="计时器" value={'2'} className="text-black dark:text-white"></Tab>
+              <Tab label="秒表" value={'3'} className="text-black dark:text-white"></Tab>
+            </Tabs>
+          </div>
+          <TabPanel value={'0'} style={{ width: 600, maxWidth: '100%', margin: 'auto' }}>
+            {ClockTab()}
+          </TabPanel>
+          <TabPanel value={'1'} style={{ width: 1400, maxWidth: '100%', margin: 'auto' }}>
+            {AlarmTab()}
+          </TabPanel>
+          <TabPanel value={'2'} style={{ width: 600, maxWidth: '100%', margin: 'auto' }}>
+            {TimerTab()}
+          </TabPanel>
+          <TabPanel value={'3'} style={{ width: 600, maxWidth: '100%', margin: 'auto' }}>
+            {StopwatchTab()}
+          </TabPanel>
+        </TabContext>
+      </div>
+    </>
+  );  
 }

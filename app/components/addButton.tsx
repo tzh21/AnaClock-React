@@ -6,13 +6,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import styles from './addButton.module.css';
+import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
 
 export default function AddButton() {
   const currHour: number = new Date().getHours();
@@ -86,33 +83,24 @@ export default function AddButton() {
     setOpenTip(true);
   }
 
-  function seeHelp() {
-    window.alert('帮助');
-  }
-
-  function seeWarning() {
-    window.alert('警告');
-  }
+  const buttonSize = 80;
 
   return (
     <>
-    <div className={styles.floatingContainer}>
-      <div className={styles.floatingButton}>+</div>
-      <div className={styles.elementContainer}>
-        <span className={styles.floatElement} title='新建闹钟' onClick={handleClickOpen}>
-        <i className={`material-icons ${styles.materialIcons}`} title='新建闹钟'>alarm
-        </i>
-        </span>
-        <span className={styles.floatElement} title='帮助' onClick={seeHelp}>
-        <i className={`material-icons ${styles.materialIcons}`} title='帮助'>help
-        </i>
-        </span>
-        <span className={styles.floatElement} title='警告' onClick={seeWarning}>
-        <i className={`material-icons ${styles.materialIcons}`} title='警告'>warning
-        </i>
-        </span>
-      </div>
-    </div>
+    <IconButton 
+      onClick={handleClickOpen} 
+      color="primary" 
+      aria-label="add an alarm"
+      style={{
+        borderRadius: '50%',
+        width: buttonSize,
+        height: buttonSize,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+      <AddIcon style={{ fontSize: buttonSize / 2 }} />
+    </IconButton>
 
     <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">新建闹钟</DialogTitle>
@@ -177,7 +165,7 @@ export default function AddButton() {
           </Alert>
         ) : (
           <Alert
-          severity="error"
+          severity="info"
           variant="filled"
           sx={{ width: '100%' }}
           >
