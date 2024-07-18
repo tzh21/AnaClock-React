@@ -6,10 +6,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
@@ -21,7 +17,6 @@ interface Alarm {
         minute: number;
     };
     alarmName: string;
-    repeat: string;
     work: boolean;
 }
 
@@ -73,7 +68,6 @@ export default function Alarms(){
     const currMinute: number = new Date().getMinutes();
     const [time, setTime] = React.useState({ hour: currHour, minute: currMinute });
     const [alarmName, setAlarmName] = React.useState('闹钟');
-    const [repeat, setRepeat] = React.useState("不重复");
 
     // open 表示是否打开编辑闹钟对话框
     const [open, setOpen] = React.useState(false);
@@ -81,11 +75,14 @@ export default function Alarms(){
     const [openTip, setOpenTip] = React.useState(false);
     // message 表示提示框的内容
     const [message, setMessage] = React.useState('');
+    // editingIndex 表示当前编辑的闹钟在 alarms 数组中的索引
+    const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
     
     const handleClose = () => {
         setMessage("0");
         setOpen(false);
         setOpenTip(true);
+        setEditingIndex(null);
     };
     
     const handleTipClose = () => {
@@ -98,13 +95,15 @@ export default function Alarms(){
     };
 
     const handleEditAlarm = () => {
+        if (editingIndex === null) return;
+
         const newAlarms = alarms.map((alarm, i) => {
-            if (i === index) {
+            if (i === editingIndex) {
                 return {
                     ...alarm,
                     time: time,
                     alarmName: alarmName,
-                    repeat: repeat
+                    work: true
                 };
             }
             return alarm;
@@ -129,15 +128,17 @@ export default function Alarms(){
         setMessage("1");
         setOpen(false);
         setOpenTip(true);
+        setEditingIndex(null);
     }
 
     const updateAlarm = (index: number) => {
+        setEditingIndex(index);
         setOpen(true);
     }
 
     return(<div>
         {alarms.map((alarm: Alarm, index: number) => (
-            <AlarmItem key={index} hour={alarm.time.hour} minute={alarm.time.minute} alarmName={alarm.alarmName} repeat={alarm.repeat}
+            <AlarmItem key={index} hour={alarm.time.hour} minute={alarm.time.minute} alarmName={alarm.alarmName}
             work={alarm.work} onToggleWork={() => toggleWork(index)}
             onUpdateAlarm={() => updateAlarm(index)}/>
         ))}
@@ -174,22 +175,6 @@ export default function Alarms(){
                 onChange={(e) => setAlarmName(e.target.value)}
                 fullWidth
             />
-            <div style={{height: 7}}></div>
-            <FormControl fullWidth>
-                <InputLabel id="repeat-label">------</InputLabel>
-                <Select
-                labelId="repeat-label"
-                id="repeat"
-                value={repeat}
-                onChange={(e) => setRepeat(e.target.value)}
-                label="重复"
-                fullWidth
-                >
-                <MenuItem value="不重复">不重复</MenuItem>
-                <MenuItem value="每天">每天</MenuItem>
-                <MenuItem value="工作日">工作日</MenuItem>
-                </Select>
-            </FormControl>
             </DialogContent>
             <DialogActions>
             <Button onClick={handleClose} color="primary">
@@ -203,7 +188,7 @@ export default function Alarms(){
 
         <Snackbar
             open={openTip}
-            autoHideDuration={2000}
+            autoHideDuration={1000}
             onClose={handleTipClose}
             message={message}
             anchorOrigin={{

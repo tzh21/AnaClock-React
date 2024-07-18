@@ -1,11 +1,13 @@
 // 计时器
 
-import { Button, TextField } from "@mui/material"
+import { Button, TextField, Dialog, DialogContent, DialogTitle } from "@mui/material"
 import { useEffect, useState } from "react"
 import StaticClock from "./components/clock"
 
 export default function TimerTab() {
   const [timeStamp, setTimeStamp] = useState(0)
+  const [overtime, setOvertime] = useState(0); // 新增用于记录超时时间的状态
+  const [showDialog, setShowDialog] = useState(false);
 
   const hour = Math.floor(timeStamp % 86400000 / 3600000)
   const minute = Math.floor(timeStamp % 3600000 / 60000)
@@ -19,16 +21,60 @@ export default function TimerTab() {
   // 暂停键状态
   const [pause, setPause] = useState(true)
 
-  // 倒计时
+
+  const sendNotification = () => {
+    if (Notification.permission === 'granted') {
+      const notification = new Notification('计时结束', {
+        body: '您设置的计时已经结束。',
+        icon: '',//可替换
+        dir: 'auto'
+      });
+  
+      notification.onclick = () => {
+        window.focus(); // 尝试将当前窗口调到前台
+        notification.close(); 
+      };
+  
+      setTimeout(() => {
+        notification.close(); // 设置通知在5秒后自动关闭
+      }, 5000);
+    }
+  };
   useEffect(() => {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('用户已允许通知。');
+        } else if (permission === 'denied') {
+          console.log('用户拒绝通知。');
+        }
+      });
+    }
+    else if (!('Notification' in window)){
+      alert('Sorry bro, your browser is not good enough to display notification');
+      return;
+    }
+    let lastUpdateTime = Date.now(); // 初始化上一次更新的时间戳
+    let setNotificiation = false;
     const interval = setInterval(() => {
-      if (pause || editing) return
+      if (pause || editing) return;
+      const now = Date.now(); // 获取当前时间戳
+      const delta = now - lastUpdateTime; // 计算从上一次更新到现在的时间差
+      lastUpdateTime = now; // 更新上一次的时间戳为当前
       setTimeStamp(prevTimeStamp => {
         if (prevTimeStamp <= 0) {
-          setPause(true)
-          return 0
+          if (!showDialog) {
+            setShowDialog(true); // 弹出对话框
+          }
+          if (!setNotificiation){
+            sendNotification();// 弹出系统提示
+            setNotificiation=true;
+          }
+          
+          setOvertime(prevOvertime => prevOvertime + delta/2); // 增加超时时间
+          return 0; 
         }
-        return prevTimeStamp - 16
+        return prevTimeStamp - delta
       })
     }, 16)
 
@@ -37,15 +83,21 @@ export default function TimerTab() {
     }
   }, [pause, editing])
 
+  const handleDialogClose = () => {
+    setShowDialog(false);
+    setOvertime(0);
+    setPause(true);
+  };
+
   return (<div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
     {StaticClock(timeStamp, false)}
 
     <div style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-      <TextField value={editing ? editingHour : hour} onChange={(e) => {setEditingHour(parseInt(e.target.value))}} label='时' sx={{width: 100}} inputProps={{readOnly: !editing}}></TextField>
+      <TextField value={editing ? editingHour : hour} onChange={(e) => {setEditingHour(parseInt(e.target.value) || 0)}} label='时' sx={{width: 100}} inputProps={{readOnly: !editing}}></TextField>
       <div style={{width: 8}}></div>
-      <TextField value={editing ? editingMinute : minute} onChange={(e) => {setEditingMinute(parseInt(e.target.value))}} label='分' sx={{width: 100}} inputProps={{readOnly: !editing}}></TextField>
+      <TextField value={editing ? editingMinute : minute} onChange={(e) => {setEditingMinute(parseInt(e.target.value) || 0)}} label='分' sx={{width: 100}} inputProps={{readOnly: !editing}}></TextField>
       <div style={{width: 8}}></div>
-      <TextField value={editing ? editingSecond : second} onChange={(e) => {setEditingSecond(parseInt(e.target.value))}} label='秒' sx={{width: 100}} inputProps={{readOnly: !editing}}></TextField>
+      <TextField value={editing ? editingSecond : second} onChange={(e) => {setEditingSecond(parseInt(e.target.value) || 0)}} label='秒' sx={{width: 100}} inputProps={{readOnly: !editing}}></TextField>
     </div>
 
     <div style={{height: 16}}></div>
@@ -76,5 +128,11 @@ export default function TimerTab() {
         }} sx={{flex: 1}}>{pause ? "恢复" : "暂停"}</Button>
       </div>
     }
+    <Dialog open={showDialog} onClose={handleDialogClose}>
+      <DialogTitle>计时结束</DialogTitle>
+      <DialogContent>
+        已超时 {Math.floor(overtime / 3600000)}小时 {Math.floor(overtime % 3600000 / 60000)}分钟 {Math.floor(overtime % 60000 / 1000)}秒
+      </DialogContent>
+    </Dialog>
   </div>)
 }

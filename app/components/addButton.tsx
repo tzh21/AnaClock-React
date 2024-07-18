@@ -19,7 +19,6 @@ export default function AddButton() {
   const currMinute: number = new Date().getMinutes();
   const [time, setTime] = React.useState({ hour: currHour, minute: currMinute });
   const [alarmName, setAlarmName] = React.useState('闹钟');
-  const [repeat, setRepeat] = React.useState("不重复");
   const [work, setWork] = React.useState(true);
 
   // open 表示是否打开新建闹钟对话框
@@ -54,7 +53,6 @@ export default function AddButton() {
       minute: number;
     };
     alarmName: string;
-    repeat: boolean;
     work: boolean;
   }
 
@@ -62,7 +60,6 @@ export default function AddButton() {
     const newAlarm = {
       time,
       alarmName,
-      repeat,
       work
     };
 
@@ -149,22 +146,6 @@ export default function AddButton() {
             onChange={(e) => setAlarmName(e.target.value)}
             fullWidth
           />
-          <div style={{height: 7}}></div>
-          <FormControl fullWidth>
-            <InputLabel id="repeat-label">------</InputLabel>
-            <Select
-              labelId="repeat-label"
-              id="repeat"
-              value={repeat}
-              onChange={(e) => setRepeat(e.target.value)}
-              label="重复"
-              fullWidth
-            >
-              <MenuItem value="不重复">不重复</MenuItem>
-              <MenuItem value="每天">每天</MenuItem>
-              <MenuItem value="工作日">工作日</MenuItem>
-            </Select>
-          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
