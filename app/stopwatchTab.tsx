@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import StaticClock from "./components/clock";
+import { useTheme } from 'next-themes';
+
+import { ThemeProvider } from 'next-themes';
+import {ThemeProvider as MUIThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { lightTheme, darkTheme } from './muiThemes';
 
 export default function StopwatchTab() {
+  const { theme } = useTheme();
+  const muiTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const bgColor = theme === 'dark' ? '#1E1E1E' : '#F7F6F2';
+  const textColor = theme === 'dark' ? 'white' : 'black';
+
   const [timeStamp, setTimeStamp] = useState(0);
   const [pause, setPause] = useState(true);
   const [laps, setLaps] = useState<string[]>([]);
@@ -65,11 +75,10 @@ export default function StopwatchTab() {
       {StaticClock(timeStamp, false)}
 
       <Box sx={{ width: '100%', maxWidth: 300, border: 1, borderRadius: 1, borderColor: 'grey.500', mx: 'auto', my: 2 }}>
-        <Typography variant="h5" align="center">
+        <Typography variant="h5" align="center" color={textColor}>
           {formattedTime}
         </Typography>
       </Box>
-
       <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
         {pause ? (
           <>
@@ -85,24 +94,29 @@ export default function StopwatchTab() {
       </div>
 
       {laps.length > 0 && (
-        <TableContainer component={Paper} ref={tableContainerRef} style={{ maxHeight: 250, overflow: 'auto', backgroundColor: 'GhostWhite', marginTop: 16 }}>
+        <ThemeProvider attribute="class">
+        <MUIThemeProvider theme={muiTheme}>
+        <CssBaseline />
+        <TableContainer component={Paper} ref={tableContainerRef} style={{ maxHeight: 250, overflow: 'auto', backgroundColor: bgColor, marginTop: 16 }}>
           <Table size="small" aria-label="lap table">
             <TableHead>
               <TableRow>
-                <TableCell align="center">计次</TableCell>
-                <TableCell align="center">时间</TableCell>
+                <TableCell align="center" style={{color: textColor}}>计次</TableCell>
+                <TableCell align="center" style={{color: textColor}}>时间</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {laps.map((lap, index) => (
                 <TableRow key={index}>
-                  <TableCell align="center">{laps.length - index}</TableCell>
-                  <TableCell align="center">{lap}</TableCell>
+                  <TableCell align="center" style={{color: textColor}}>{laps.length - index}</TableCell>
+                  <TableCell align="center" style={{color: textColor}}>{lap}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        </MUIThemeProvider>
+        </ThemeProvider>
       )}
     </div>
   );
