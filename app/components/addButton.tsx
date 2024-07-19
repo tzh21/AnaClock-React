@@ -8,10 +8,17 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import Fab from '@mui/material/Fab';
+import { Fab, Zoom, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 export default function AddButton() {
+  const theme = useTheme();
+  const transitionDuration = {
+    enter: theme.transitions.duration.enteringScreen,
+    exit: theme.transitions.duration.leavingScreen,
+  };
+  const [showFab, setShowFab] = React.useState(false);
+
   const currHour: number = new Date().getHours();
   const currMinute: number = new Date().getMinutes();
   const [time, setTime] = React.useState({ hour: currHour, minute: currMinute });
@@ -81,12 +88,32 @@ export default function AddButton() {
   }
 
   const buttonSize = 65;
+  React.useEffect(() => {
+    setShowFab(true);
+    return () => {
+      setShowFab(false);
+    };
+  }, []);
 
   return (
     <>
-    <Fab color="primary" aria-label="add" style={{width: buttonSize, height: buttonSize}} onClick={handleClickOpen}>
-      <AddIcon style={{ fontSize: buttonSize / 2 }} />
-    </Fab>
+    <Zoom
+      in={showFab}
+      timeout={transitionDuration}
+      style={{
+        transitionDelay: `${showFab ? transitionDuration.exit : 0}ms`,
+      }}
+      unmountOnExit
+    >
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={{ width: buttonSize, height: buttonSize }}
+        onClick={handleClickOpen}
+      >
+        <AddIcon style={{ fontSize: buttonSize / 2 }} />
+      </Fab>
+    </Zoom>
 
     <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">新建闹钟</DialogTitle>
