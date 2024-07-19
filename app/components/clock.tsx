@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ScaleGroup from './scale';
 import Pivot from './pivot';
 import * as d3 from 'd3';
+import { useTheme } from 'next-themes';
 
 /*
 静态时钟组件。
@@ -14,6 +15,9 @@ export default function StaticClock(
   draggable: boolean = false,
   setNewTimeStamp: (newTimeStamp: number) => void = (n) => {}
 ) {
+  const { theme } = useTheme();
+  const outColor = theme === 'dark' ? 'white' : 'black';
+
   // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
   const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
 
@@ -96,7 +100,7 @@ export default function StaticClock(
   return (<div style={{width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
     <svg style={{width: clockContainerSize, height: clockContainerSize}}>
       {/* 表盘 */}
-      <circle cx={centerX} cy={centerY} r={radius} fill="transparent" stroke="black" strokeWidth={2} />
+      <circle cx={centerX} cy={centerY} r={radius} fill="transparent" stroke={outColor} strokeWidth={2} />
       
       {/* 刻度 */}
       {ScaleGroup(radius, centerX, centerY)}
@@ -105,10 +109,10 @@ export default function StaticClock(
       <line id='secondHand' x1={centerX} y1={centerY} x2={secondHandX2} y2={secondHandY2} style={{stroke: 'red', strokeWidth: radius * 0.02}}></line>
 
       {/* 分针 */}
-      <line id='minuteHand' x1={centerX} y1={centerY} x2={minuteHandX2} y2={minuteHandY2} style={{stroke: 'black', strokeWidth: radius * 0.03}}></line>
+      <line id='minuteHand' x1={centerX} y1={centerY} x2={minuteHandX2} y2={minuteHandY2} style={{stroke: outColor, strokeWidth: radius * 0.03}}></line>
 
       {/* 时针 */}
-      <line id='hourHand' x1={centerX} y1={centerY} x2={hourHandX2} y2={hourHandY2} style={{stroke: 'black', strokeWidth: radius * 0.05}}></line>
+      <line id='hourHand' x1={centerX} y1={centerY} x2={hourHandX2} y2={hourHandY2} style={{stroke: outColor, strokeWidth: radius * 0.05}}></line>
 
       {/* 表盘中心的小圆圈 */}
       {Pivot(radius, centerX, centerY)}

@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import IconButton from '@mui/material/IconButton';
+import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
 export default function AddButton() {
@@ -64,15 +64,12 @@ export default function AddButton() {
     existingAlarms.push(newAlarm);
 
     const sortedAlarms = existingAlarms.sort((a: Alarm, b: Alarm) => {
-      // 优先根据 work 排序，work 为 true 的在前
       if (a.work !== b.work) {
           return b.work ? 1 : -1;
       }
-      // 如果 work 相同，根据 hour 排序，hour 小的在前
       if (a.time.hour !== b.time.hour) {
           return a.time.hour - b.time.hour;
       }
-      // 如果 hour 也相同，根据 minute 排序，minute 小的在前
       return a.time.minute - b.time.minute;
     });
 
@@ -83,24 +80,13 @@ export default function AddButton() {
     setOpenTip(true);
   }
 
-  const buttonSize = 80;
+  const buttonSize = 65;
 
   return (
     <>
-    <IconButton 
-      onClick={handleClickOpen} 
-      color="primary" 
-      aria-label="add an alarm"
-      style={{
-        borderRadius: '50%',
-        width: buttonSize,
-        height: buttonSize,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+    <Fab color="primary" aria-label="add" style={{width: buttonSize, height: buttonSize}} onClick={handleClickOpen}>
       <AddIcon style={{ fontSize: buttonSize / 2 }} />
-    </IconButton>
+    </Fab>
 
     <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">新建闹钟</DialogTitle>

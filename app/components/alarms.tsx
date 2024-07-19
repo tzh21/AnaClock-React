@@ -27,21 +27,124 @@ const fetchAlarms = (): Alarm[] => {
 
 export default function Alarms(){
     const [alarms, setAlarms] = React.useState<Alarm[]>([]);
+    const [overtime, setOvertime] = React.useState(0);    // 用于记录超时时间的状态
+    const [showDialog, setShowDialog] = React.useState(false);    // 用于控制超时提示框的显示
 
     // editingIndex 表示当前编辑的闹钟在 alarms 数组中的索引
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
 
     React.useEffect(() => {
         const updateAlarms = () => setAlarms(fetchAlarms());
-
         window.addEventListener('alarms-updated', updateAlarms);
-
         updateAlarms();
+
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+              if (permission === 'granted') {
+                console.log('用户已允许通知。');
+              } else if (permission === 'denied') {
+                console.log('用户拒绝通知。');
+              }
+            });
+        }
+        else if (!('Notification' in window)){
+            alert('Sorry bro, your browser is not good enough to display notification');
+            return;
+        }
 
         return () => {
             window.removeEventListener('alarms-updated', updateAlarms);
         };
     }, []);
+
+    // 用于定时检查当前时间与alarms时间匹配的useEffect
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            checkAlarmTime();
+        }, 1000); // 每秒检查一次
+
+        return () => clearInterval(interval);
+    }, [alarms]);
+
+    // 监听openDialog的状态，以控制计时器
+    React.useEffect(() => {
+        let intervalId: number | null = null;
+
+        if (showDialog) {
+            // 当showDialog为true时，启动一个定时器每秒增加overtime
+            intervalId = window.setInterval(() => {
+                setOvertime(prevOvertime => prevOvertime + 1);
+            }, 1000) as unknown as number; 
+        } else {
+            // 当showDialog为false时，停止计时器
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        }
+
+        // 组件卸载时清理定时器
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [showDialog]);
+
+    const checkAlarmTime = () => {
+        const now = new Date();
+        const currHour = now.getHours();
+        const currMinute = now.getMinutes();
+    
+        // 创建一个新数组以避免直接修改状态
+        const updatedAlarms = alarms.map((alarm) => {
+            if (alarm.work && alarm.time.hour === currHour && alarm.time.minute === currMinute) {
+                // 触发通知并显示对话框
+                setShowDialog(true);
+                sendNotification();
+    
+                // 返回修改后的alarm对象，将work设置为false
+                return { ...alarm, work: false };
+            }
+            // 未触发的alarm原样返回
+            return alarm;
+        });
+
+        const sortedAlarms = updatedAlarms.sort((a: Alarm, b: Alarm) => {
+            if (a.work !== b.work) {
+                return b.work ? 1 : -1;
+            }
+            if (a.time.hour !== b.time.hour) {
+                return a.time.hour - b.time.hour;
+            }
+            return a.time.minute - b.time.minute;
+          });
+    
+        setAlarms(sortedAlarms);
+    
+        localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
+        window.dispatchEvent(new Event('alarms-updated'));
+    };
+
+    const sendNotification = () => {
+        console.log('send alarm notification');
+
+        if (Notification.permission === 'granted') {
+          const notification = new Notification('闹钟提醒', {
+            body: '您设置的闹钟已经开启。',
+            icon: '',
+            dir: 'auto'
+          });
+      
+          notification.onclick = () => {
+            window.focus(); // 尝试将当前窗口调到前台
+            notification.close(); 
+          };
+      
+          setTimeout(() => {
+            notification.close();   // 设置通知在5秒后自动关闭
+          }, 10000);
+        }
+    };
 
     const toggleWork = (index: number) => {
         const newAlarms = alarms.map((alarm, i) => {
@@ -50,19 +153,16 @@ export default function Alarms(){
             }
             return alarm;
         });
-        setAlarms(newAlarms);
         const sortedAlarms = newAlarms.sort((a: Alarm, b: Alarm) => {
-            // 优先根据 work 排序，work 为 true 的在前
             if (a.work !== b.work) {
                 return b.work ? 1 : -1;
             }
-            // 如果 work 相同，根据 hour 排序，hour 小的在前
             if (a.time.hour !== b.time.hour) {
                 return a.time.hour - b.time.hour;
             }
-            // 如果 hour 也相同，根据 minute 排序，minute 小的在前
             return a.time.minute - b.time.minute;
           });
+        setAlarms(sortedAlarms);
         localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
         window.dispatchEvent(new Event('alarms-updated'));
     }
@@ -71,6 +171,18 @@ export default function Alarms(){
     const currMinute: number = editingIndex === null ? new Date().getMinutes() : alarms[editingIndex].time.minute;
     const [time, setTime] = React.useState({ hour: currHour, minute: currMinute });
     const [alarmName, setAlarmName] = React.useState(editingIndex === null ? "闹钟" : alarms[editingIndex].alarmName);
+    // 监听 editingIndex 的变化，并更新 time 和 alarmName
+    React.useEffect(() => {
+        // 当 editingIndex 改变时计算新的值
+        const newHour = editingIndex === null ? new Date().getHours() : alarms[editingIndex].time.hour;
+        const newMinute = editingIndex === null ? new Date().getMinutes() : alarms[editingIndex].time.minute;
+        const newAlarmName = editingIndex === null ? "闹钟" : alarms[editingIndex].alarmName;
+
+        // 更新状态
+        setTime({ hour: newHour, minute: newMinute });
+        setAlarmName(newAlarmName);
+
+    }, [editingIndex]);
 
     // open 表示是否打开编辑闹钟对话框
     const [open, setOpen] = React.useState(false);
@@ -90,21 +202,18 @@ export default function Alarms(){
         if (editingIndex === null) return;
 
         const newAlarms = alarms.filter((alarm, i) => i !== editingIndex);
-        setAlarms(newAlarms);
     
         const sortedAlarms = newAlarms.sort((a: Alarm, b: Alarm) => {
-          // 优先根据 work 排序，work 为 true 的在前
           if (a.work !== b.work) {
               return b.work ? 1 : -1;
           }
-          // 如果 work 相同，根据 hour 排序，hour 小的在前
           if (a.time.hour !== b.time.hour) {
               return a.time.hour - b.time.hour;
           }
-          // 如果 hour 也相同，根据 minute 排序，minute 小的在前
           return a.time.minute - b.time.minute;
         });
     
+        setAlarms(sortedAlarms);
         localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
         window.dispatchEvent(new Event('alarms-updated'));
         setMessage("-1");
@@ -139,15 +248,12 @@ export default function Alarms(){
         setAlarms(newAlarms);
     
         const sortedAlarms = newAlarms.sort((a: Alarm, b: Alarm) => {
-          // 优先根据 work 排序，work 为 true 的在前
           if (a.work !== b.work) {
               return b.work ? 1 : -1;
           }
-          // 如果 work 相同，根据 hour 排序，hour 小的在前
           if (a.time.hour !== b.time.hour) {
               return a.time.hour - b.time.hour;
           }
-          // 如果 hour 也相同，根据 minute 排序，minute 小的在前
           return a.time.minute - b.time.minute;
         });
     
@@ -163,6 +269,11 @@ export default function Alarms(){
         setEditingIndex(index);
         setOpen(true);
     }
+
+    const handleDialogClose = () => {
+        setShowDialog(false);
+        setOvertime(0);
+    };
 
     return(<div>
         {alarms.map((alarm: Alarm, index: number) => (
@@ -252,5 +363,12 @@ export default function Alarms(){
                 </Alert>
             )}
         </Snackbar>
+
+        <Dialog open={showDialog} onClose={handleDialogClose}>
+            <DialogTitle>您设置的闹钟已开启</DialogTitle>
+            <DialogContent>
+                已响铃 {Math.floor(overtime / 3600)}小时 {Math.floor(overtime % 3600 / 60)}分钟 {Math.floor(overtime % 60)}秒
+            </DialogContent>
+        </Dialog>
     </div>);
 }
