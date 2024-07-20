@@ -8,10 +8,22 @@ import {ThemeProvider as MUIThemeProvider, createTheme, CssBaseline } from '@mui
 import { lightTheme, darkTheme } from './muiThemes';
 
 export default function StopwatchTab() {
-  const { theme } = useTheme();
+  const { theme, systemTheme } = useTheme();
   const muiTheme = theme === 'dark' ? darkTheme : lightTheme;
-  const bgColor = theme === 'dark' ? '#1E1E1E' : '#F7F6F2';
-  const textColor = theme === 'dark' ? 'white' : 'black';
+  const [bgColor, setBgColor] = useState('#F7F6F2');
+  const [textColor, setTextColor] = useState('black');
+  React.useEffect(() => {
+    if (theme === 'dark') {
+      setBgColor('#1E1E1E');
+      setTextColor('white');
+    } else if (theme === 'light') {
+      setBgColor('#F7F6F2');
+      setTextColor('black');
+    } else if (theme === 'system') {
+      setBgColor(systemTheme === 'dark' ? '#1E1E1E' : '#F7F6F2');
+      setTextColor(systemTheme === 'dark' ? 'white' : 'black');
+    }
+  }, [theme, systemTheme]);
 
   const [timeStamp, setTimeStamp] = useState(0);
   const [pause, setPause] = useState(true);

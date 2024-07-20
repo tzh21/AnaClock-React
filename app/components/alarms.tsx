@@ -228,7 +228,12 @@ export default function Alarms(){
 
     const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = event.target;
-        setTime({ ...time, [id]: parseInt(value) });
+        const numberValue = parseInt(value);
+    
+        if (id === "hour" && (numberValue < 0 || numberValue > 23)) return;
+        if (id === "minute" && (numberValue < 0 || numberValue > 59)) return;
+    
+        setTime({ ...time, [id]: numberValue });
     };
 
     const handleEditAlarm = () => {
@@ -293,6 +298,7 @@ export default function Alarms(){
                 label="小时"
                 type="number"
                 value={time.hour}
+                inputProps={{ step: 1, min: 0, max: 23 }}
                 onChange={handleTimeChange}
                 fullWidth
             />
@@ -302,6 +308,7 @@ export default function Alarms(){
                 label="分钟"
                 type="number"
                 value={time.minute}
+                inputProps={{ step: 1, min: 0, max: 59 }}
                 onChange={handleTimeChange}
                 fullWidth
             />

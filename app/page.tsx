@@ -31,10 +31,10 @@ function ClockTabs() {
   const [selectedTab, setSelectedTab] = useState('0');
 
   return (
-    <ThemeProvider attribute="class">
+    <ThemeProvider defaultTheme='system' enableSystem={true} attribute="class">
       <MUIThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <div style={{ position: 'absolute', top: 0, right: 0 }}>
+      <div style={{ position: 'fixed', top: 0, right: 0 }}>
         <ToggleButtonGroup
           color="primary"
           value={theme}

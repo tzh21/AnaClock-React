@@ -15,9 +15,18 @@ export default function StaticClock(
   draggable: boolean = false,
   setNewTimeStamp: (newTimeStamp: number) => void = (n) => {}
 ) {
-  const { theme } = useTheme();
-  const outColor = theme === 'dark' ? 'white' : 'black';
-
+  const { theme, systemTheme } = useTheme();
+  const [outColor, setOutColor] = useState('black');
+  React.useEffect(() => {
+    if (theme === 'dark') {
+      setOutColor('white');
+    } else if (theme === 'light') {
+      setOutColor('black');
+    } else if (theme === 'system') {
+      setOutColor(systemTheme === 'dark' ? 'white' : 'black');
+    }
+  }, [theme, systemTheme]);
+  
   // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
   const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
 
