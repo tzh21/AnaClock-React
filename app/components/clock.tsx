@@ -18,6 +18,7 @@ export default function StaticClock(
   const { theme, systemTheme } = useTheme();
   const [outColor, setOutColor] = useState('black');
   React.useEffect(() => {
+    console.log(theme, systemTheme)
     if (theme === 'dark') {
       setOutColor('white');
     } else if (theme === 'light') {

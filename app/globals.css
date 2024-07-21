@@ -53,3 +53,11 @@ body {
   top: 5px;
   transform-origin: center 95px; */
 }
+
+.dark {
+  background-color: #181818;
+}
+
+.light {
+  background-color: white;
+}
