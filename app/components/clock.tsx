@@ -65,8 +65,21 @@ export default function StaticClock(
   }
 
   function dragElem(elem: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
-    const newRad = Math.atan2(event.x - centerX, centerY - event.y)
-    const oldRad = Math.atan2(elem.x2.baseVal.value - centerX, centerY - elem.y2.baseVal.value)
+    // 计算拖拽前后的角度，范围为 [0, 2 * Math.PI)
+    var newRad = Math.atan2(event.x - centerX, centerY - event.y)
+    if (newRad < 0) {
+      newRad += Math.PI * 2
+    }
+    var oldRad = Math.atan2(elem.x2.baseVal.value - centerX, centerY - elem.y2.baseVal.value)
+    if (oldRad < 0) {
+      oldRad += Math.PI * 2
+    }
+    // 如果拖拽后越过 0 点，需要加一个偏移量，用于切换上下午
+    if (2 * Math.PI * 0.9 < oldRad && newRad < 2 * Math.PI * 0.1) {
+      newRad += Math.PI * 2
+    } else if (2 * Math.PI * 0.9 < newRad && oldRad < 2 * Math.PI * 0.1) {
+      newRad -= Math.PI * 2
+    }
     const deltaDeg = (newRad - oldRad) / Math.PI * 180
     var deltaTimeStamp = 0
     switch (datum.id) {
@@ -89,7 +102,6 @@ export default function StaticClock(
 
   function endDragging(this: SVGLineElement, event: DragEvent, datum: HandIdAndLen) {
     dragElem(this, event, datum)
-    console.log(internalTimeStampRef.current)
     setNewTimeStamp(internalTimeStampRef.current)
     setDragging(false)
   }
