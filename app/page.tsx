@@ -12,9 +12,10 @@ import AlarmTab from './alarmTab';
 import { TabContext, TabPanel } from '@mui/lab';
 import TimerTab from './timerTab';
 import StopwatchTab from './stopwatchTab';
+import ContrastIcon from '@mui/icons-material/Contrast';
 
 import { ThemeProvider } from 'next-themes';
-import {ThemeProvider as MUIThemeProvider, Theme } from '@mui/material';
+import {Fab, ThemeProvider as MUIThemeProvider, Theme } from '@mui/material';
 import { lightTheme, darkTheme } from './muiThemes';
 
 export default function Page() {
@@ -36,15 +37,20 @@ export default function Page() {
       <MUIThemeProvider theme={muiTheme}>
         <div style={{height: 100}}></div>
         <div style={{ position: 'fixed', top: 0, right: 0 }}>
-          <ToggleButtonGroup
-            color="primary"
-            value={theme}
-            exclusive
-            aria-label="ToggleMode">
-            <ToggleButton value="system" onClick={() => setTheme('system')}>System</ToggleButton>
-            <ToggleButton value="dark" onClick={() => setTheme('dark')}>Dark</ToggleButton>
-            <ToggleButton value="light" onClick={() => setTheme('light')}>Light</ToggleButton>
-          </ToggleButtonGroup>
+          <Fab
+            onClick={() => {
+              if (theme === 'dark') {
+                setTheme('light');
+              }
+              else {
+                setTheme('dark');
+              }
+            }}
+            sx={{top: 100, right: 200}}
+            color='primary'
+          >
+            <ContrastIcon></ContrastIcon>
+          </Fab>
         </div>
         {ClockTabs()}
       </MUIThemeProvider>
