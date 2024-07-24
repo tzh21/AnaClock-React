@@ -4,7 +4,7 @@ import StaticClock from "./components/clock";
 import { useTheme } from 'next-themes';
 
 import { ThemeProvider } from 'next-themes';
-import {ThemeProvider as MUIThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import {ThemeProvider as MUIThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from './muiThemes';
 
 export default function StopwatchTab() {
@@ -83,53 +83,57 @@ export default function StopwatchTab() {
   };
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-      {StaticClock(timeStamp, false)}
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+      <div style={{width: 400, display: 'flex', flexDirection: 'column', position: 'relative'}}>
+        {StaticClock(timeStamp, false)}
+        <Box sx={{ width: '100%', maxWidth: 300, border: 1, borderRadius: 1, borderColor: 'grey.500', mx: 'auto', my: 2 }}>
+          <Typography variant="h5" align="center" color={textColor}>
+            {formattedTime}
+          </Typography>
+        </Box>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+          {pause ? (
+            <>
+              <Button onClick={handleReset} sx={{ flex: 1 }}>复位</Button>
+              <Button onClick={handleStart} sx={{ flex: 1 }}>启动</Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={handleLap} sx={{ flex: 1 }}>标记</Button>
+              <Button onClick={() => setPause(true)} sx={{ flex: 1 }}>暂停</Button>
+            </>
+          )}
+        </div>
 
-      <Box sx={{ width: '100%', maxWidth: 300, border: 1, borderRadius: 1, borderColor: 'grey.500', mx: 'auto', my: 2 }}>
-        <Typography variant="h5" align="center" color={textColor}>
-          {formattedTime}
-        </Typography>
-      </Box>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-        {pause ? (
-          <>
-            <Button onClick={handleReset} sx={{ flex: 1 }}>复位</Button>
-            <Button onClick={handleStart} sx={{ flex: 1 }}>启动</Button>
-          </>
-        ) : (
-          <>
-            <Button onClick={handleLap} sx={{ flex: 1 }}>标记</Button>
-            <Button onClick={() => setPause(true)} sx={{ flex: 1 }}>暂停</Button>
-          </>
-        )}
+        <div style={{position: 'absolute', left: '100%', width: 400}}>
+          {laps.length > 0 && (
+            <ThemeProvider attribute="class">
+            <MUIThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            <TableContainer component={Paper} ref={tableContainerRef} style={{ maxHeight: 250, overflow: 'auto', backgroundColor: bgColor, marginTop: 16 }}>
+              <Table size="small" aria-label="lap table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center" style={{color: textColor}}>计次</TableCell>
+                    <TableCell align="center" style={{color: textColor}}>时间</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {laps.map((lap, index) => (
+                    <TableRow key={index}>
+                      <TableCell align="center" style={{color: textColor}}>{laps.length - index}</TableCell>
+                      <TableCell align="center" style={{color: textColor}}>{lap}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            </MUIThemeProvider>
+            </ThemeProvider>
+          )}
+        </div>
       </div>
 
-      {laps.length > 0 && (
-        <ThemeProvider attribute="class">
-        <MUIThemeProvider theme={muiTheme}>
-        <CssBaseline />
-        <TableContainer component={Paper} ref={tableContainerRef} style={{ maxHeight: 250, overflow: 'auto', backgroundColor: bgColor, marginTop: 16 }}>
-          <Table size="small" aria-label="lap table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" style={{color: textColor}}>计次</TableCell>
-                <TableCell align="center" style={{color: textColor}}>时间</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {laps.map((lap, index) => (
-                <TableRow key={index}>
-                  <TableCell align="center" style={{color: textColor}}>{laps.length - index}</TableCell>
-                  <TableCell align="center" style={{color: textColor}}>{lap}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        </MUIThemeProvider>
-        </ThemeProvider>
-      )}
     </div>
   );
 }

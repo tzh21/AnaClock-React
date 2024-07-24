@@ -2,9 +2,7 @@
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
 import ClockTab from './clockTab';
@@ -15,7 +13,7 @@ import StopwatchTab from './stopwatchTab';
 import ContrastIcon from '@mui/icons-material/Contrast';
 
 import { ThemeProvider } from 'next-themes';
-import {Fab, ThemeProvider as MUIThemeProvider, Theme } from '@mui/material';
+import { Fab, ThemeProvider as MUIThemeProvider, Theme } from '@mui/material';
 import { lightTheme, darkTheme } from './muiThemes';
 
 export default function Page() {

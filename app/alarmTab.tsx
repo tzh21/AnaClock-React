@@ -1,6 +1,6 @@
 import StaticClock from "./components/clock";
 import { useEffect, useState } from "react";
-import { TextField, Dialog, DialogContent, DialogTitle } from "@mui/material"
+import { TextField } from "@mui/material"
 
 import AddButton from "./components/addButton";
 import Alarms from "./components/alarms";
