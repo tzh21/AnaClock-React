@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.7.3)  26 JUL 2024 18:53
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.7.3)  26 JUL 2024 22:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -626,41 +626,65 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 LaTeX Warning: No \author given.
 
-(build/main.toc)
+(build/main.toc [1
+
+])
 \tf@toc=\write4
 \openout4 = `main.toc'.
 
- [1
+ [2] [3] [4]
 
-]
+Package fontspec Warning: Font "STFangsong" does not contain requested Script
+(fontspec)                "CJK".
+
+
+Package fontspec Info: Could not resolve font "STFangsong/BI" (it probably
+(fontspec)             doesn't exist).
+
+
+Package fontspec Info: Could not resolve font "STFangsong/B" (it probably
+(fontspec)             doesn't exist).
+
+
+Package fontspec Info: Could not resolve font "STFangsong/I" (it probably
+(fontspec)             doesn't exist).
+
+
+Package fontspec Info: Font family 'STFangsong(0)' created for font
+(fontspec)             'STFangsong' with options [Script={CJK}].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->"STFangsong/OT:language=dflt;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+
+[5]
 File: image/clock.png Graphic file (type bmp)
 <image/clock.png>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 File: image/alarm.png Graphic file (type bmp)
 <image/alarm.png>
 File: image/alarm_add.png Graphic file (type bmp)
 <image/alarm_add.png>
- [2]
+[6] [7]
 File: image/alarm_edit.png Graphic file (type bmp)
 <image/alarm_edit.png>
 File: image/alarm_trigger.png Graphic file (type bmp)
 <image/alarm_trigger.png>
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
 File: image/timer.png Graphic file (type bmp)
 <image/timer.png>
 File: image/timer_tri.png Graphic file (type bmp)
 <image/timer_tri.png>
-[3]
+ [8]
 File: image/stopwatch.png Graphic file (type bmp)
 <image/stopwatch.png>
 File: image/stopwatch_time.png Graphic file (type bmp)
 <image/stopwatch_time.png>
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
 File: image/clock.png Graphic file (type bmp)
 <image/clock.png>
 File: image/clock_black.png Graphic file (type bmp)
@@ -669,7 +693,10 @@ File: image/alarm.png Graphic file (type bmp)
 <image/alarm.png>
 File: image/alarm_black.png Graphic file (type bmp)
 <image/alarm_black.png>
-[4]
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 File: image/timer.png Graphic file (type bmp)
 <image/timer.png>
 File: image/timer_black.png Graphic file (type bmp)
@@ -679,26 +706,33 @@ File: image/stopwatch.png Graphic file (type bmp)
 File: image/stopwatch_black.png Graphic file (type bmp)
 <image/stopwatch_black.png>
 
-
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[5] [6] [7
+[9]
 
-] (build/main.aux)
+LaTeX Warning: Text page 10 contains only floats.
+
+[10] [11
+
+] [12] [13] [14] (build/main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/08/05>
  ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 16343F4F457BDFE2E2096061BD7A6C8A;1635.
+(rerunfilecheck)             Checksum: 4DBC8263BD3E7EBCDADE5757F6D84159;5197.
  ) 
 Here is how much of TeX's memory you used:
- 16994 strings out of 474773
- 361296 string characters out of 5757725
- 1932839 words of memory out of 5000000
- 38897 multiletter control sequences out of 15000+600000
- 566440 words of font info for 85 fonts, out of 8000000 for 9000
+ 17071 strings out of 474773
+ 364864 string characters out of 5757725
+ 1936839 words of memory out of 5000000
+ 38963 multiletter control sequences out of 15000+600000
+ 566488 words of font info for 91 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 93i,7n,97p,363b,369s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 93i,7n,97p,504b,458s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on build/main.pdf (7 pages).
+Output written on build/main.pdf (14 pages).
