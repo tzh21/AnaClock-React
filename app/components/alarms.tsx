@@ -25,7 +25,7 @@ const fetchAlarms = (): Alarm[] => {
     return data ? JSON.parse(data) : [];
 };
 
-export default function Alarms(){
+export default function Alarms() {
     const [alarms, setAlarms] = React.useState<Alarm[]>([]);
     const [overtime, setOvertime] = React.useState(0);    // 用于记录超时时间的状态
     const [showDialog, setShowDialog] = React.useState(false);    // 用于控制超时提示框的显示
@@ -40,14 +40,14 @@ export default function Alarms(){
 
         if ('Notification' in window) {
             Notification.requestPermission().then(permission => {
-              if (permission === 'granted') {
-                console.log('用户已允许通知。');
-              } else if (permission === 'denied') {
-                console.log('用户拒绝通知。');
-              }
+                if (permission === 'granted') {
+                    console.log('用户已允许通知。');
+                } else if (permission === 'denied') {
+                    console.log('用户拒绝通知。');
+                }
             });
         }
-        else if (!('Notification' in window)){
+        else if (!('Notification' in window)) {
             alert('Sorry bro, your browser is not good enough to display notification');
             return;
         }
@@ -74,7 +74,7 @@ export default function Alarms(){
             // 当showDialog为true时，启动一个定时器每秒增加overtime
             intervalId = window.setInterval(() => {
                 setOvertime(prevOvertime => prevOvertime + 1);
-            }, 1000) as unknown as number; 
+            }, 1000) as unknown as number;
         } else {
             // 当showDialog为false时，停止计时器
             if (intervalId) {
@@ -94,14 +94,14 @@ export default function Alarms(){
         const now = new Date();
         const currHour = now.getHours();
         const currMinute = now.getMinutes();
-    
+
         // 创建一个新数组以避免直接修改状态
         const updatedAlarms = alarms.map((alarm) => {
             if (alarm.work && alarm.time.hour === currHour && alarm.time.minute === currMinute) {
                 // 触发通知并显示对话框
                 setShowDialog(true);
                 sendNotification();
-    
+
                 // 返回修改后的alarm对象，将work设置为false
                 return { ...alarm, work: false };
             }
@@ -117,10 +117,10 @@ export default function Alarms(){
                 return a.time.hour - b.time.hour;
             }
             return a.time.minute - b.time.minute;
-          });
-    
+        });
+
         setAlarms(sortedAlarms);
-    
+
         localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
         window.dispatchEvent(new Event('alarms-updated'));
     };
@@ -129,20 +129,20 @@ export default function Alarms(){
         console.log('send alarm notification');
 
         if (Notification.permission === 'granted') {
-          const notification = new Notification('闹钟提醒', {
-            body: '您设置的闹钟已经开启。',
-            icon: '',
-            dir: 'auto'
-          });
-      
-          notification.onclick = () => {
-            window.focus(); // 尝试将当前窗口调到前台
-            notification.close(); 
-          };
-      
-          setTimeout(() => {
-            notification.close();   // 设置通知在5秒后自动关闭
-          }, 10000);
+            const notification = new Notification('闹钟提醒', {
+                body: '您设置的闹钟已经超时',
+                icon: '',
+                dir: 'auto'
+            });
+
+            notification.onclick = () => {
+                window.focus(); // 尝试将当前窗口调到前台
+                notification.close();
+            };
+
+            setTimeout(() => {
+                notification.close();   // 设置通知在5秒后自动关闭
+            }, 10000);
         }
     };
 
@@ -161,7 +161,7 @@ export default function Alarms(){
                 return a.time.hour - b.time.hour;
             }
             return a.time.minute - b.time.minute;
-          });
+        });
         setAlarms(sortedAlarms);
         localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
         window.dispatchEvent(new Event('alarms-updated'));
@@ -190,7 +190,7 @@ export default function Alarms(){
     const [openTip, setOpenTip] = React.useState(false);
     // message 表示提示框的内容
     const [message, setMessage] = React.useState('');
-    
+
     const handleClose = () => {
         setMessage("0");
         setOpen(false);
@@ -202,17 +202,17 @@ export default function Alarms(){
         if (editingIndex === null) return;
 
         const newAlarms = alarms.filter((alarm, i) => i !== editingIndex);
-    
+
         const sortedAlarms = newAlarms.sort((a: Alarm, b: Alarm) => {
-          if (a.work !== b.work) {
-              return b.work ? 1 : -1;
-          }
-          if (a.time.hour !== b.time.hour) {
-              return a.time.hour - b.time.hour;
-          }
-          return a.time.minute - b.time.minute;
+            if (a.work !== b.work) {
+                return b.work ? 1 : -1;
+            }
+            if (a.time.hour !== b.time.hour) {
+                return a.time.hour - b.time.hour;
+            }
+            return a.time.minute - b.time.minute;
         });
-    
+
         setAlarms(sortedAlarms);
         localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
         window.dispatchEvent(new Event('alarms-updated'));
@@ -221,7 +221,7 @@ export default function Alarms(){
         setOpenTip(true);
         setEditingIndex(null);
     }
-    
+
     const handleTipClose = () => {
         setOpenTip(false);
     }
@@ -229,10 +229,10 @@ export default function Alarms(){
     const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = event.target;
         const numberValue = parseInt(value);
-    
+
         if (id === "hour" && (numberValue < 0 || numberValue > 23)) return;
         if (id === "minute" && (numberValue < 0 || numberValue > 59)) return;
-    
+
         setTime({ ...time, [id]: numberValue });
     };
 
@@ -251,17 +251,17 @@ export default function Alarms(){
             return alarm;
         });
         setAlarms(newAlarms);
-    
+
         const sortedAlarms = newAlarms.sort((a: Alarm, b: Alarm) => {
-          if (a.work !== b.work) {
-              return b.work ? 1 : -1;
-          }
-          if (a.time.hour !== b.time.hour) {
-              return a.time.hour - b.time.hour;
-          }
-          return a.time.minute - b.time.minute;
+            if (a.work !== b.work) {
+                return b.work ? 1 : -1;
+            }
+            if (a.time.hour !== b.time.hour) {
+                return a.time.hour - b.time.hour;
+            }
+            return a.time.minute - b.time.minute;
         });
-    
+
         localStorage.setItem('alarms', JSON.stringify(sortedAlarms));
         window.dispatchEvent(new Event('alarms-updated'));
         setMessage("1");
@@ -280,55 +280,55 @@ export default function Alarms(){
         setOvertime(0);
     };
 
-    return(<div>
+    return (<div>
         {alarms.map((alarm: Alarm, index: number) => (
             <AlarmItem key={index} hour={alarm.time.hour} minute={alarm.time.minute} alarmName={alarm.alarmName}
-            work={alarm.work} onToggleWork={() => toggleWork(index)}
-            onUpdateAlarm={() => updateAlarm(index)}/>
+                work={alarm.work} onToggleWork={() => toggleWork(index)}
+                onUpdateAlarm={() => updateAlarm(index)} />
         ))}
 
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">编辑闹钟</DialogTitle>
             <DialogContent>
-            <DialogContentText>
-            </DialogContentText>
-            <TextField
-                margin="dense"
-                id="hour"
-                label="小时"
-                type="number"
-                value={time.hour}
-                inputProps={{ step: 1, min: 0, max: 23 }}
-                onChange={handleTimeChange}
-                fullWidth
-            />
-            <TextField
-                margin="dense"
-                id="minute"
-                label="分钟"
-                type="number"
-                value={time.minute}
-                inputProps={{ step: 1, min: 0, max: 59 }}
-                onChange={handleTimeChange}
-                fullWidth
-            />
-            <TextField
-                margin="dense"
-                id="name"
-                label="闹钟名称"
-                type="text"
-                value={alarmName}
-                onChange={(e) => setAlarmName(e.target.value)}
-                fullWidth
-            />
+                <DialogContentText>
+                </DialogContentText>
+                <TextField
+                    margin="dense"
+                    id="hour"
+                    label="小时"
+                    type="number"
+                    value={time.hour}
+                    inputProps={{ step: 1, min: 0, max: 23 }}
+                    onChange={handleTimeChange}
+                    fullWidth
+                />
+                <TextField
+                    margin="dense"
+                    id="minute"
+                    label="分钟"
+                    type="number"
+                    value={time.minute}
+                    inputProps={{ step: 1, min: 0, max: 59 }}
+                    onChange={handleTimeChange}
+                    fullWidth
+                />
+                <TextField
+                    margin="dense"
+                    id="name"
+                    label="闹钟名称"
+                    type="text"
+                    value={alarmName}
+                    onChange={(e) => setAlarmName(e.target.value)}
+                    fullWidth
+                />
             </DialogContent>
             <DialogActions style={{ justifyContent: 'space-between' }}>
                 <Button onClick={handleDelete} color='error'>
-                删除
+                    删除
                 </Button>
                 <div>
                     <Button onClick={handleClose} color="primary">
-                    取消
+                        取消
                     </Button>
                     <Button onClick={handleEditAlarm} color="primary">
                         确认
@@ -343,8 +343,8 @@ export default function Alarms(){
             onClose={handleTipClose}
             message={message}
             anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+                vertical: 'top',
+                horizontal: 'center',
             }}
         >
             {message === "1" ? (
@@ -352,14 +352,14 @@ export default function Alarms(){
                     severity="success"
                     variant="filled"
                     sx={{ width: '100%' }}>
-                闹钟已成功修改
+                    闹钟已成功修改
                 </Alert>
             ) : message === "-1" ? (
                 <Alert
                     severity="error"
                     variant="filled"
                     sx={{ width: '100%' }}>
-                闹钟已删除
+                    闹钟已删除
                 </Alert>
             ) : (
                 <Alert
@@ -372,9 +372,15 @@ export default function Alarms(){
         </Snackbar>
 
         <Dialog open={showDialog} onClose={handleDialogClose}>
-            <DialogTitle>您设置的闹钟已开启</DialogTitle>
-            <DialogContent>
-                已响铃 {Math.floor(overtime / 3600)}小时 {Math.floor(overtime % 3600 / 60)}分钟 {Math.floor(overtime % 60)}秒
+            <DialogTitle>您设置的闹钟已超时</DialogTitle>
+            <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ width: '100%', padding: 16, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                    <TextField value={Math.floor(overtime / 3600)} label='时' sx={{ width: 100 }} inputProps={{ readOnly: true }}></TextField>
+                    <div style={{ width: 8 }}></div>
+                    <TextField value={Math.floor(overtime % 3600 / 60)} label='分' sx={{ width: 100 }} inputProps={{ readOnly: true }}></TextField>
+                    <div style={{ width: 8 }}></div>
+                    <TextField value={Math.floor(overtime % 60)} label='秒' sx={{ width: 100 }} inputProps={{ readOnly: true }}></TextField>
+                </div>
             </DialogContent>
         </Dialog>
     </div>);

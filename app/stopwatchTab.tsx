@@ -105,12 +105,13 @@ export default function StopwatchTab() {
           )}
         </div>
 
-        <div style={{position: 'absolute', left: '100%', width: 400}}>
+        <div style={{position: 'absolute', left: '100%', width: 400, height: 470, overflowY: 'auto', paddingLeft: 38, paddingRight: 38}}>
           {laps.length > 0 && (
             <ThemeProvider attribute="class">
             <MUIThemeProvider theme={muiTheme}>
             <CssBaseline />
-            <TableContainer component={Paper} ref={tableContainerRef} style={{ maxHeight: 250, overflow: 'auto', backgroundColor: bgColor, marginTop: 16 }}>
+            <TableContainer component={Paper} ref={tableContainerRef} style={{ overflow: 'auto', backgroundColor: bgColor }}>
+              {/* <Table size="small" aria-label="lap table" style={{paddingLeft: 38, paddingRight: 38}}> */}
               <Table size="small" aria-label="lap table">
                 <TableHead>
                   <TableRow>
