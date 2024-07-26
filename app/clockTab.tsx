@@ -2,7 +2,7 @@ import StaticClock from "./components/clock";
 import { useEffect, useState } from "react";
 import { Button, TextField } from "@mui/material";
 
-export default function ClockTab() {
+export default function ClockTab(selected: boolean) {
   const [timeStamp, setTimeStamp] = useState(0)
 
   const hour = Math.floor(timeStamp % 86400000 / 3600000)
@@ -31,7 +31,7 @@ export default function ClockTab() {
 
   return (<div style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
     {/* 时钟 */}
-    {StaticClock(timeStamp, true, setTimeStamp)}
+    {StaticClock('clockTab', timeStamp, selected, setTimeStamp)}
 
     {/* 数字时间 */}
     <div style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>

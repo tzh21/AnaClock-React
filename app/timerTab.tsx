@@ -42,13 +42,7 @@ export default function TimerTab() {
   };
   useEffect(() => {
     if ('Notification' in window) {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('用户已允许通知。');
-        } else if (permission === 'denied') {
-          console.log('用户拒绝通知。');
-        }
-      });
+      Notification.requestPermission()
     }
     else if (!('Notification' in window)) {
       alert('Sorry bro, your browser is not good enough to display notification');
@@ -90,7 +84,7 @@ export default function TimerTab() {
   };
 
   return (<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-    {StaticClock(timeStamp, false)}
+    {StaticClock('timerTab', timeStamp, false)}
 
     <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
       <TextField value={editing ? editingHour : hour} onChange={(e) => { setEditingHour(parseInt(e.target.value) || 0) }} label='时' sx={{ width: 100 }} inputProps={{ readOnly: !editing }}></TextField>

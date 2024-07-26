@@ -39,13 +39,7 @@ export default function Alarms() {
         updateAlarms();
 
         if ('Notification' in window) {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    console.log('用户已允许通知。');
-                } else if (permission === 'denied') {
-                    console.log('用户拒绝通知。');
-                }
-            });
+            Notification.requestPermission()
         }
         else if (!('Notification' in window)) {
             alert('Sorry bro, your browser is not good enough to display notification');
@@ -126,8 +120,6 @@ export default function Alarms() {
     };
 
     const sendNotification = () => {
-        console.log('send alarm notification');
-
         if (Notification.permission === 'granted') {
             const notification = new Notification('闹钟提醒', {
                 body: '您设置的闹钟已经超时',

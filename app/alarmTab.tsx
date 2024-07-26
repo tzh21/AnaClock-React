@@ -42,7 +42,8 @@ export default function AlarmTab() {
       
           {/* 时钟和数字 */}
           <div style={{ width: 400, display: 'flex', flexDirection: 'column' }}>
-              {StaticClock(timeStamp, false, setTimeStamp)}
+              {StaticClock('alarmTab', timeStamp, false)}
+              {/* {StaticClock(timeStamp, false)} */}
               <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                   <TextField value={hour} label='时' sx={{ width: 100 }} inputProps={{ readOnly: true }} />
                   <div style={{ width: 8 }}></div>

@@ -11,14 +11,18 @@ import { useTheme } from 'next-themes';
 接受一个参数作为拖拽功能的开关。
 */
 export default function StaticClock(
+  id: string, // 用于不同的实例
   timeStamp: number,
   draggable: boolean = false,
   setNewTimeStamp: (newTimeStamp: number) => void = (n) => {}
 ) {
+  const hourHandId = `${id}-hourHand`
+  const minuteHandId = `${id}-minuteHand`
+  const secondHandId = `${id}-secondHand`
+
   const { theme, systemTheme } = useTheme();
   const [outColor, setOutColor] = useState('black');
   React.useEffect(() => {
-    console.log(theme, systemTheme)
     if (theme === 'dark') {
       setOutColor('white');
     } else if (theme === 'light') {
@@ -30,7 +34,6 @@ export default function StaticClock(
   
   // 组件内部保留的时间戳。如果发生了拖拽，则不会使用父组件传递的时间戳，而是使用这个时间戳。
   const [internalTimeStamp, setInternalTimeStamp] = useState(timeStamp)
-
   const [dragging, setDragging] = useState(false)
   useEffect(() => {
     if (!dragging) {
@@ -39,10 +42,12 @@ export default function StaticClock(
   }, [timeStamp])
 
   useEffect(() => {
-    d3.select<SVGLineElement, HandIdAndLen>('#secondHand').data([secondHandAndLen])
-    d3.select<SVGLineElement, HandIdAndLen>('#minuteHand').data([minuteHandAndLen])
-    d3.select<SVGLineElement, HandIdAndLen>('#hourHand').data([hourHandAndLen])
-  }, [])
+    if (draggable) {
+      d3.select<SVGLineElement, HandIdAndLen>(`#${secondHandId}`).data([secondHandAndLen])
+      d3.select<SVGLineElement, HandIdAndLen>(`#${minuteHandId}`).data([minuteHandAndLen])
+      d3.select<SVGLineElement, HandIdAndLen>(`#${hourHandId}`).data([hourHandAndLen])
+    }
+  }, [draggable])
 
   const internalTimeStampRef = useRef(internalTimeStamp)
   useEffect(() => {
@@ -82,7 +87,7 @@ export default function StaticClock(
     }
     const deltaDeg = (newRad - oldRad) / Math.PI * 180
     var deltaTimeStamp = 0
-    switch (datum.id) {
+    switch (datum.classname) {
       case 'secondHand':
         deltaTimeStamp = deltaDeg / 360 * 60000
         break
@@ -113,9 +118,9 @@ export default function StaticClock(
 
   useEffect(() => {
     if (draggable) {
-      d3.select<SVGLineElement, HandIdAndLen>('#secondHand').call(DragBehavior)
-      d3.select<SVGLineElement, HandIdAndLen>('#minuteHand').call(DragBehavior)
-      d3.select<SVGLineElement, HandIdAndLen>('#hourHand').call(DragBehavior)
+      d3.select<SVGLineElement, HandIdAndLen>(`#${secondHandId}`).call(DragBehavior)
+      d3.select<SVGLineElement, HandIdAndLen>(`#${minuteHandId}`).call(DragBehavior)
+      d3.select<SVGLineElement, HandIdAndLen>(`#${hourHandId}`).call(DragBehavior)
     }
   }, [draggable])
 
@@ -128,13 +133,13 @@ export default function StaticClock(
       {ScaleGroup(radius, centerX, centerY)}
 
       {/* 秒针 */}
-      <line id='secondHand' x1={centerX} y1={centerY} x2={secondHandX2} y2={secondHandY2} style={{stroke: 'red', strokeWidth: radius * 0.02}}></line>
+      <line id={secondHandId} x1={centerX} y1={centerY} x2={secondHandX2} y2={secondHandY2} style={{stroke: 'red', strokeWidth: radius * 0.02}}></line>
 
       {/* 分针 */}
-      <line id='minuteHand' x1={centerX} y1={centerY} x2={minuteHandX2} y2={minuteHandY2} style={{stroke: outColor, strokeWidth: radius * 0.03}}></line>
+      <line id={minuteHandId} x1={centerX} y1={centerY} x2={minuteHandX2} y2={minuteHandY2} style={{stroke: outColor, strokeWidth: radius * 0.03}}></line>
 
       {/* 时针 */}
-      <line id='hourHand' x1={centerX} y1={centerY} x2={hourHandX2} y2={hourHandY2} style={{stroke: outColor, strokeWidth: radius * 0.05}}></line>
+      <line id={hourHandId} x1={centerX} y1={centerY} x2={hourHandX2} y2={hourHandY2} style={{stroke: outColor, strokeWidth: radius * 0.05}}></line>
 
       {/* 表盘中心的小圆圈 */}
       {Pivot(radius, centerX, centerY)}
@@ -155,13 +160,13 @@ const minuteHandLen = radius * 0.8
 const hourHandLen = radius * 0.6
 
 interface HandIdAndLen {
-  id: string,
+  classname: string,
   len: number
 }
 
-const secondHandAndLen: HandIdAndLen = { id: 'secondHand', len: secondHandLen }
-const minuteHandAndLen: HandIdAndLen = { id: 'minuteHand', len: minuteHandLen }
-const hourHandAndLen: HandIdAndLen = { id: 'hourHand', len: hourHandLen }
+const secondHandAndLen: HandIdAndLen = { classname: 'secondHand', len: secondHandLen }
+const minuteHandAndLen: HandIdAndLen = { classname: 'minuteHand', len: minuteHandLen }
+const hourHandAndLen: HandIdAndLen = { classname: 'hourHand', len: hourHandLen }
 
 function calcHandPosition(
   deg: number, handLen: number,

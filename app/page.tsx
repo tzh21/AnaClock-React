@@ -72,7 +72,7 @@ function ClockTabs() {
           </Tabs>
         </div>
         <TabPanel value={'0'} style={{ width: 600, maxWidth: '100%', margin: 'auto' }}>
-          {ClockTab()}
+          {ClockTab(selectedTab == '0')}
         </TabPanel>
         <TabPanel value={'1'} style={{ width: 1400, maxWidth: '100%', margin: 'auto' }}>
           {AlarmTab()}

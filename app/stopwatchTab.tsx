@@ -85,7 +85,7 @@ export default function StopwatchTab() {
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
       <div style={{width: 400, display: 'flex', flexDirection: 'column', position: 'relative'}}>
-        {StaticClock(timeStamp, false)}
+        {StaticClock('stopwatchTab', timeStamp, false)}
         <Box sx={{ width: '100%', maxWidth: 300, border: 1, borderRadius: 1, borderColor: 'grey.500', mx: 'auto', my: 2 }}>
           <Typography variant="h5" align="center" color={textColor}>
             {formattedTime}
