@@ -18,13 +18,21 @@ npm install
 npm run dev
 ```
 
-在浏览器中访问页面所在的 url（默认为 localhost:3000）
+在浏览器中访问页面所在的 url（默认为 localhost:3000）即可
 
-应该看到类似以下的场景
+## 常见问题
 
-![](readme-assets/clock.png)
+build 时间过长很可能是网络的原因。尝试设置 npm 镜像源，如设置腾讯镜像源
 
-## 目标清单
+```sh
+npm config set registry http://mirrors.cloud.tencent.com/npm/
+```
+
+## 项目说明文档位置
+
+`documentation/build/main.pdf`
+
+## 功能列表
 
 ### 时钟
 
